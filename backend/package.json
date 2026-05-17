@@ -1,0 +1,21 @@
+{
+  "name": "avacom-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "dev": "sam local start-api --env-vars env.local.json",
+    "deploy": "npm run build && sam deploy",
+    "deploy:guided": "npm run build && sam deploy --guided",
+    "test": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:all": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --project unit",
+    "lint": "eslint 'src/**/*.ts'",
+    "typecheck": "tsc --noEmit",
+    "ddb:up": "docker compose up -d",
+    "ddb:down": "docker compose down"
+  }
+}
