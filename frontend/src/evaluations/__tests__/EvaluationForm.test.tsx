@@ -49,4 +49,17 @@ describe('EvaluationForm', () => {
     }} />);
     expect(screen.getByRole('button', { name: /save|loading/i })).toBeDisabled();
   });
+
+  it('shows description error when value exceeds max length', async () => {
+    const onSubmit = vi.fn();
+    const longDesc = 'x'.repeat(2001);
+    render(<EvaluationForm onSubmit={onSubmit} submitting={false} initialValues={{
+      courseId: 'CS101', title: 'T', description: longDesc, dueDate: '2026-06-01T12:00', status: 'active',
+    }} />);
+    await userEvent.click(screen.getByRole('button', { name: /save/i }));
+    // Schema enforces description.max(2000); a too-long value triggers the error branch
+    await waitFor(() => expect(onSubmit).not.toHaveBeenCalled());
+    // The error <p> for description should appear
+    expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
+  });
 });

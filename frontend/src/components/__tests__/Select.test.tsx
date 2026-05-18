@@ -27,4 +27,10 @@ describe('Select', () => {
     render(<Select label="Fruit" id="fruit" options={options} error="pick one" />);
     expect(screen.getByText('pick one')).toBeInTheDocument();
   });
+
+  it('renders placeholder option when provided', () => {
+    render(<Select label="Fruit" id="fruit" options={options} placeholder="Choose..." />);
+    expect(screen.getByRole('option', { name: 'Choose...' })).toBeInTheDocument();
+    expect(screen.getAllByRole('option')).toHaveLength(3);
+  });
 });

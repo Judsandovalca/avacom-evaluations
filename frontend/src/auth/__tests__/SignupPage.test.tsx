@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
+import { http, HttpResponse } from 'msw';
 import { Route, Routes } from 'react-router-dom';
 import { renderWithProviders, screen, waitFor } from '../../__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
+import { server } from '../../__tests__/msw/server';
 import { AuthProvider } from '../AuthProvider';
 import { SignupPage } from '../SignupPage';
 import { ToastProvider } from '../../components/ToastProvider';
@@ -55,5 +57,18 @@ describe('SignupPage', () => {
     await userEvent.type(screen.getByLabelText(/name/i), 'New');
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
     await waitFor(() => expect(screen.getByText('Evaluations home')).toBeInTheDocument());
+  });
+
+  it('shows generic error toast on non-409 failure', async () => {
+    server.use(
+      http.post('/api/auth/signup', () => HttpResponse.json({ error: { code: 'INTERNAL' } }, { status: 500 })),
+    );
+    renderWithProviders(<App />, { initialEntries: ['/signup'] });
+    await waitFor(() => screen.getByLabelText(/email/i));
+    await userEvent.type(screen.getByLabelText(/email/i), 'err@x.com');
+    await userEvent.type(screen.getByLabelText(/password/i), 'password123');
+    await userEvent.type(screen.getByLabelText(/name/i), 'Err');
+    await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
+    expect(await screen.findByText(/could not sign up/i)).toBeInTheDocument();
   });
 });

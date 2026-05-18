@@ -17,4 +17,18 @@ describe('FiltersBar', () => {
     await userEvent.type(screen.getByLabelText('Course ID'), 'C');
     expect(onChange).toHaveBeenLastCalledWith({ status: undefined, courseId: 'C' });
   });
+
+  it('clears status filter to undefined when "All statuses" is selected', async () => {
+    const onChange = vi.fn();
+    render(<FiltersBar status="active" courseId="CS101" onChange={onChange} />);
+    await userEvent.selectOptions(screen.getByLabelText('Status'), '');
+    expect(onChange).toHaveBeenLastCalledWith({ status: undefined, courseId: 'CS101' });
+  });
+
+  it('clears courseId to undefined when input is emptied', async () => {
+    const onChange = vi.fn();
+    render(<FiltersBar status="active" courseId="C" onChange={onChange} />);
+    await userEvent.clear(screen.getByLabelText('Course ID'));
+    expect(onChange).toHaveBeenLastCalledWith({ status: 'active', courseId: undefined });
+  });
 });

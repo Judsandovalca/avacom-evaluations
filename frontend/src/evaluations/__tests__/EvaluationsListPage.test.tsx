@@ -53,4 +53,28 @@ describe('EvaluationsListPage', () => {
     await userEvent.click(deleteButtons[deleteButtons.length - 1]);
     await waitFor(() => expect(screen.queryByText(/are you sure/i)).not.toBeInTheDocument());
   });
+
+  it('cancels delete dialog without deleting', async () => {
+    renderWithProviders(<App />, { initialEntries: ['/evaluations'] });
+    await waitFor(() => screen.getByText('Eval 1'));
+    await userEvent.click(screen.getByText('Delete'));
+    expect(await screen.findByText(/are you sure/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    await waitFor(() => expect(screen.queryByText(/are you sure/i)).not.toBeInTheDocument());
+    // Item still present
+    expect(screen.getByText('Eval 1')).toBeInTheDocument();
+  });
+
+  it('shows error toast when delete fails', async () => {
+    server.use(
+      http.delete('/api/evaluations/:id', () => HttpResponse.json({ error: { code: 'INTERNAL' } }, { status: 500 })),
+    );
+    renderWithProviders(<App />, { initialEntries: ['/evaluations'] });
+    await waitFor(() => screen.getByText('Eval 1'));
+    await userEvent.click(screen.getByText('Delete'));
+    expect(await screen.findByText(/are you sure/i)).toBeInTheDocument();
+    const deleteButtons = screen.getAllByRole('button', { name: /^delete$/i });
+    await userEvent.click(deleteButtons[deleteButtons.length - 1]);
+    expect(await screen.findByText(/could not delete/i)).toBeInTheDocument();
+  });
 });

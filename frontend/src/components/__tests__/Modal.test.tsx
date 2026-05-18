@@ -29,4 +29,19 @@ describe('Modal', () => {
     await userEvent.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('ignores non-Escape keys', async () => {
+    const onClose = vi.fn();
+    render(<Modal open onClose={onClose} title="t"><p>x</p></Modal>);
+    await userEvent.keyboard('a');
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('does not register listener when closed', () => {
+    const onClose = vi.fn();
+    const { rerender } = render(<Modal open={false} onClose={onClose} title="t"><p>x</p></Modal>);
+    // Re-render to make sure effect cleanup path runs
+    rerender(<Modal open onClose={onClose} title="t"><p>x</p></Modal>);
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });

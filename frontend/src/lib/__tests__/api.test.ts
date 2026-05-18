@@ -78,4 +78,15 @@ describe('api with refresh interceptor', () => {
     await expect(api.get('/x')).rejects.toThrowError();
     expect(refreshCalls).toBe(0);
   });
+
+  it('does not refresh when the failing request is on an /auth/ path', async () => {
+    let refreshCalls = 0;
+    server.use(
+      http.post('/api/auth/login', () => HttpResponse.json({ error: { code: 'UNAUTHORIZED' } }, { status: 401 })),
+      http.post('/api/auth/refresh', () => { refreshCalls += 1; return new HttpResponse(null, { status: 204 }); }),
+    );
+    const api = await freshApi();
+    await expect(api.post('/auth/login', { email: 'a@b.com', password: 'x' })).rejects.toThrowError();
+    expect(refreshCalls).toBe(0);
+  });
 });

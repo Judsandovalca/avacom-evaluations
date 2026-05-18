@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { http, HttpResponse } from 'msw';
+import { render } from '@testing-library/react';
 import { server } from '../../__tests__/msw/server';
 import { renderWithProviders, screen, waitFor } from '../../__tests__/test-utils';
 import { AuthProvider } from '../AuthProvider';
@@ -28,5 +29,11 @@ describe('AuthProvider', () => {
     renderWithProviders(<AuthProvider><Probe /></AuthProvider>);
     await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('no'));
     expect(screen.getByTestId('user')).toHaveTextContent('anon');
+  });
+
+  it('useAuth throws when used outside AuthProvider', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => render(<Probe />)).toThrow(/useAuth must be used within AuthProvider/);
+    spy.mockRestore();
   });
 });
