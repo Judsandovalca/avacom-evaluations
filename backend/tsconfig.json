@@ -16,7 +16,6 @@
     "verbatimModuleSyntax": false,
     "noEmit": true,
     "outDir": "dist",
-    "rootDir": "src",
     "types": ["node", "vitest/globals"]
   },
   "include": ["src/**/*.ts", "vitest.config.ts", "esbuild.config.mjs"],
