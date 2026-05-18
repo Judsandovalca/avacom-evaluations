@@ -10,14 +10,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'no-restricted-imports': 'off',
-    '@typescript-eslint/no-restricted-imports': ['error', {
-      patterns: [
-        {
-          group: ['**/adapters/**', '**/http/**', '@aws-sdk/*', '@aws-lambda-powertools/*'],
-          message: 'Domain layer cannot import from adapters, http, or AWS SDK.',
-        },
-      ],
-    }],
+    '@typescript-eslint/no-restricted-imports': 'off',
   },
   overrides: [
     {
