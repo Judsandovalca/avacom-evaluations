@@ -1,5 +1,6 @@
 // src/evaluations/EvaluationsTable.tsx
 import { Link } from 'react-router-dom';
+import { useCourses } from '../courses/hooks/useCourses';
 import type { Evaluation } from './types';
 
 interface Props {
@@ -14,6 +15,9 @@ const statusBadge: Record<string, string> = {
 };
 
 export function EvaluationsTable({ items, onDelete }: Props) {
+  const { data: courses } = useCourses();
+  const courseNameById = new Map((courses ?? []).map((c) => [c.courseId, c.name]));
+
   if (items.length === 0) {
     return <p className="text-slate-500 italic">No evaluations yet. Create your first one.</p>;
   }
@@ -32,7 +36,7 @@ export function EvaluationsTable({ items, onDelete }: Props) {
         {items.map((e) => (
           <tr key={e.evaluationId} className="border-b border-slate-100 hover:bg-slate-50">
             <td className="py-2 pr-4 font-medium text-slate-900">{e.title}</td>
-            <td className="py-2 pr-4">{e.courseId}</td>
+            <td className="py-2 pr-4">{courseNameById.get(e.courseId) ?? e.courseId}</td>
             <td className="py-2 pr-4">{new Date(e.dueDate).toLocaleString()}</td>
             <td className="py-2 pr-4">
               <span className={`inline-block rounded-full px-2 py-0.5 text-xs ${statusBadge[e.status]}`}>{e.status}</span>

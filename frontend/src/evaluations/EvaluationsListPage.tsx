@@ -32,9 +32,12 @@ export function EvaluationsListPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-slate-900">Evaluations</h1>
-        <Link to="/evaluations/new" className="btn-primary">New evaluation</Link>
+        <div className="flex gap-3 items-center">
+          <Link to="/courses" className="text-brand-600 hover:underline text-sm">Manage courses</Link>
+          <Link to="/evaluations/new" className="btn-primary">New evaluation</Link>
+        </div>
       </div>
 
       <FiltersBar status={filters.status} courseId={filters.courseId} onChange={setFilters} />

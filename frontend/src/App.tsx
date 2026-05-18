@@ -7,6 +7,7 @@ import { LoginPage } from './auth/LoginPage';
 import { SignupPage } from './auth/SignupPage';
 import { EvaluationsListPage } from './evaluations/EvaluationsListPage';
 import { EvaluationFormPage } from './evaluations/EvaluationFormPage';
+import { CoursesPage } from './courses/CoursesPage';
 import { NotFoundPage } from './NotFoundPage';
 import { ToastProvider } from './components/ToastProvider';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -30,6 +31,7 @@ export default function App() {
                   <Route path="/evaluations" element={<EvaluationsListPage />} />
                   <Route path="/evaluations/new" element={<EvaluationFormPage mode="create" />} />
                   <Route path="/evaluations/:id/edit" element={<EvaluationFormPage mode="edit" />} />
+                  <Route path="/courses" element={<CoursesPage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

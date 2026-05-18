@@ -55,5 +55,22 @@ export const handlers = [
 
   http.delete(`${API}/evaluations/:id`, () => new HttpResponse(null, { status: 204 })),
 
+  http.get(`${API}/courses`, () => HttpResponse.json({
+    items: [
+      { courseId: 'c-1', name: 'Algorithms', createdAt: '2026-05-17T10:00:00.000Z' },
+      { courseId: 'c-2', name: 'Data Structures', createdAt: '2026-05-17T10:00:00.000Z' },
+    ],
+  })),
+
+  http.post(`${API}/courses`, async ({ request }) => {
+    const body = await request.json() as { name: string };
+    if (body.name === 'Algorithms') {
+      return HttpResponse.json({ error: { code: 'CONFLICT', message: 'exists' } }, { status: 409 });
+    }
+    return HttpResponse.json({
+      course: { courseId: 'new-course-id', name: body.name, createdAt: '2026-05-17T10:00:00.000Z' },
+    }, { status: 201 });
+  }),
+
   http.get(`${API}/health`, () => HttpResponse.json({ status: 'ok', version: 'test', uptime: 1 })),
 ];

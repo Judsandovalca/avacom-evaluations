@@ -3,6 +3,7 @@ import { DynamoDBClient, CreateTableCommand, DeleteTableCommand } from '@aws-sdk
 
 export const TEST_EVALUATIONS_TABLE = 'test-Evaluations';
 export const TEST_USERS_TABLE = 'test-Users';
+export const TEST_COURSES_TABLE = 'test-Courses';
 
 export const ddbClient = new DynamoDBClient({
   endpoint: 'http://localhost:8000',
@@ -41,8 +42,17 @@ async function createUsersTable() {
   }));
 }
 
+async function createCoursesTable() {
+  await ddbClient.send(new CreateTableCommand({
+    TableName: TEST_COURSES_TABLE,
+    AttributeDefinitions: [{ AttributeName: 'courseId', AttributeType: 'S' }],
+    KeySchema: [{ AttributeName: 'courseId', KeyType: 'HASH' }],
+    ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
+  }));
+}
+
 async function dropTables() {
-  for (const name of [TEST_EVALUATIONS_TABLE, TEST_USERS_TABLE]) {
+  for (const name of [TEST_EVALUATIONS_TABLE, TEST_USERS_TABLE, TEST_COURSES_TABLE]) {
     try { await ddbClient.send(new DeleteTableCommand({ TableName: name })); }
     catch { /* not exist */ }
   }
@@ -52,6 +62,7 @@ beforeAll(async () => {
   await dropTables();
   await createEvaluationsTable();
   await createUsersTable();
+  await createCoursesTable();
 });
 
 afterAll(async () => {

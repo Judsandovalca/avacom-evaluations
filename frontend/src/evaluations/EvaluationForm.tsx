@@ -1,10 +1,12 @@
 // src/evaluations/EvaluationForm.tsx
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from 'react-router-dom';
 import { evaluationFormSchema, type EvaluationFormInput } from '../lib/schemas';
 import { Input } from '../components/Input';
 import { Select } from '../components/Select';
 import { Button } from '../components/Button';
+import { useCourses } from '../courses/hooks/useCourses';
 
 interface Props {
   initialValues?: EvaluationFormInput;
@@ -24,9 +26,31 @@ export function EvaluationForm({ initialValues, submitting, onSubmit }: Props) {
     defaultValues: initialValues ?? { courseId: '', title: '', description: '', dueDate: '', status: 'active' },
   });
 
+  const { data: courses, isLoading: coursesLoading } = useCourses();
+  const courseOptions = (courses ?? []).map((c) => ({ value: c.courseId, label: c.name }));
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-2xl">
-      <Input label="Course ID" id="courseId" {...register('courseId')} error={errors.courseId?.message} />
+      <div>
+        {coursesLoading ? (
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-slate-700">Course</label>
+            <div className="input-base text-slate-400">Loading courses…</div>
+          </div>
+        ) : (
+          <Select
+            label="Course"
+            id="courseId"
+            options={courseOptions}
+            placeholder="Select a course"
+            {...register('courseId')}
+            error={errors.courseId?.message}
+          />
+        )}
+        <p className="text-xs text-slate-500 mt-1">
+          Need a different one? <Link to="/courses" className="text-brand-600 hover:underline">Manage courses</Link>
+        </p>
+      </div>
       <Input label="Title" id="title" {...register('title')} error={errors.title?.message} />
       <div className="space-y-1">
         <label htmlFor="description" className="block text-sm font-medium text-slate-700">Description</label>

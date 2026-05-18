@@ -19,6 +19,7 @@ Globals:
         NODE_OPTIONS: '--enable-source-maps'
         EVALUATIONS_TABLE: !Ref EvaluationsTable
         USERS_TABLE: !Ref UsersTable
+        COURSES_TABLE: !Ref CoursesTable
         JWT_SECRET: !Sub '{{resolve:secretsmanager:${JwtSecret}:SecretString:secret}}'
         APP_VERSION: '1.0.0'
         POWERTOOLS_SERVICE_NAME: avacom-api
@@ -63,6 +64,16 @@ Resources:
       KeySchema:
         - { AttributeName: email, KeyType: HASH }
 
+  CoursesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub avacom-courses-${Stage}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: courseId, AttributeType: S }
+      KeySchema:
+        - { AttributeName: courseId, KeyType: HASH }
+
   HttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -84,8 +95,8 @@ Resources:
       Tracing: Active
       Policies:
         - DynamoDBCrudPolicy: { TableName: !Ref EvaluationsTable }
-        - DynamoDBReadPolicy: { TableName: !Ref EvaluationsTable }
         - DynamoDBCrudPolicy: { TableName: !Ref UsersTable }
+        - DynamoDBCrudPolicy: { TableName: !Ref CoursesTable }
         - Statement:
             - Effect: Allow
               Action: secretsmanager:GetSecretValue
@@ -108,3 +119,5 @@ Outputs:
     Value: !Ref EvaluationsTable
   UsersTableName:
     Value: !Ref UsersTable
+  CoursesTableName:
+    Value: !Ref CoursesTable

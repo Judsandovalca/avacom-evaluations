@@ -24,7 +24,8 @@ describe('EvaluationFormPage', () => {
   it('create mode renders empty form and submits', async () => {
     renderWithProviders(<App />, { initialEntries: ['/evaluations/new'] });
     expect(await screen.findByText('New evaluation')).toBeInTheDocument();
-    await userEvent.type(screen.getByLabelText(/course id/i), 'CS101');
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Algorithms' })).toBeInTheDocument());
+    await userEvent.selectOptions(screen.getByLabelText(/course/i), 'c-1');
     await userEvent.type(screen.getByLabelText(/title/i), 'T');
     await userEvent.type(screen.getByLabelText(/description/i), 'D');
     await userEvent.type(screen.getByLabelText(/due date/i), '2026-06-01T12:00');
@@ -46,7 +47,8 @@ describe('EvaluationFormPage', () => {
     );
     renderWithProviders(<App />, { initialEntries: ['/evaluations/new'] });
     expect(await screen.findByText('New evaluation')).toBeInTheDocument();
-    await userEvent.type(screen.getByLabelText(/course id/i), 'CS101');
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Algorithms' })).toBeInTheDocument());
+    await userEvent.selectOptions(screen.getByLabelText(/course/i), 'c-1');
     await userEvent.type(screen.getByLabelText(/title/i), 'T');
     await userEvent.type(screen.getByLabelText(/description/i), 'D');
     await userEvent.type(screen.getByLabelText(/due date/i), '2026-06-01T12:00');

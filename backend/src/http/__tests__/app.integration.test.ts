@@ -4,16 +4,20 @@ import { DynamoDBDocumentClient, ScanCommand, DeleteCommand } from '@aws-sdk/lib
 import { buildApp } from '../app';
 import { DynamoEvaluationRepository } from '../../adapters/persistence/DynamoEvaluationRepository';
 import { DynamoUserRepository } from '../../adapters/persistence/DynamoUserRepository';
+import { DynamoCourseRepository } from '../../adapters/persistence/DynamoCourseRepository';
 import { JwtTokenService } from '../../adapters/auth/JwtTokenService';
 import { BcryptHasher } from '../../adapters/auth/bcryptHasher';
-import { ddbClient, TEST_EVALUATIONS_TABLE, TEST_USERS_TABLE } from '../../__tests__/setup-integration';
+import { ddbClient, TEST_EVALUATIONS_TABLE, TEST_USERS_TABLE, TEST_COURSES_TABLE } from '../../__tests__/setup-integration';
 
 const doc = DynamoDBDocumentClient.from(ddbClient);
 async function clearAll() {
-  for (const t of [TEST_EVALUATIONS_TABLE, TEST_USERS_TABLE]) {
+  for (const t of [TEST_EVALUATIONS_TABLE, TEST_USERS_TABLE, TEST_COURSES_TABLE]) {
     const s = await doc.send(new ScanCommand({ TableName: t }));
     for (const i of s.Items ?? []) {
-      const key = t === TEST_USERS_TABLE ? { email: i.email } : { evaluationId: i.evaluationId };
+      let key: Record<string, unknown>;
+      if (t === TEST_USERS_TABLE) key = { email: i.email };
+      else if (t === TEST_COURSES_TABLE) key = { courseId: i.courseId };
+      else key = { evaluationId: i.evaluationId };
       await doc.send(new DeleteCommand({ TableName: t, Key: key }));
     }
   }
@@ -22,9 +26,10 @@ async function clearAll() {
 function buildTestApp() {
   const evaluationRepo = new DynamoEvaluationRepository(TEST_EVALUATIONS_TABLE, doc);
   const userRepo = new DynamoUserRepository(TEST_USERS_TABLE, doc);
+  const courseRepo = new DynamoCourseRepository(TEST_COURSES_TABLE, doc);
   const tokens = new JwtTokenService('test-secret-must-be-at-least-32-chars+', { accessTtl: '15m', refreshTtl: '7d' });
   const hasher = new BcryptHasher();
-  return buildApp({ evaluationRepo, userRepo, tokens, hasher, verifier: hasher });
+  return buildApp({ evaluationRepo, userRepo, courseRepo, tokens, hasher, verifier: hasher });
 }
 
 function cookieHeader(setCookies: string[]): string {
@@ -58,14 +63,14 @@ describe('app (integration)', () => {
       }),
     });
     expect(create.status).toBe(201);
-    const { evaluation } = await create.json();
+    const { evaluation } = await create.json() as any;
     expect(evaluation.userId).toBeTruthy();
     const evalId = evaluation.evaluationId;
 
     // 3. List
     const list = await app.request('/api/evaluations', { headers: { Cookie } });
     expect(list.status).toBe(200);
-    const listBody = await list.json();
+    const listBody = await list.json() as any;
     expect(listBody.items).toHaveLength(1);
 
     // 4. Get
@@ -79,7 +84,7 @@ describe('app (integration)', () => {
       body: JSON.stringify({ title: 'New title' }),
     });
     expect(upd.status).toBe(200);
-    expect((await upd.json()).evaluation.title).toBe('New title');
+    expect((await upd.json() as any).evaluation.title).toBe('New title');
 
     // 6. Delete (soft)
     const del = await app.request(`/api/evaluations/${evalId}`, {
@@ -89,7 +94,7 @@ describe('app (integration)', () => {
 
     // 7. List empty
     const list2 = await app.request('/api/evaluations', { headers: { Cookie } });
-    expect((await list2.json()).items).toHaveLength(0);
+    expect((await list2.json() as any).items).toHaveLength(0);
   });
 
   it('rejects request without auth cookie', async () => {
@@ -117,7 +122,7 @@ describe('app (integration)', () => {
     });
     const cB = cookieHeader(sB.headers.getSetCookie());
     const list = await app.request('/api/evaluations', { headers: { Cookie: cB } });
-    expect((await list.json()).items).toHaveLength(0);
+    expect((await list.json() as any).items).toHaveLength(0);
   });
 
   it('signup with duplicate email returns 409', async () => {
@@ -144,7 +149,7 @@ describe('app (integration)', () => {
   it('GET /api/health responds 200', async () => {
     const r = await buildTestApp().request('/api/health');
     expect(r.status).toBe(200);
-    expect((await r.json()).status).toBe('ok');
+    expect((await r.json() as any).status).toBe('ok');
   });
 
   it('logout clears cookies', async () => {
@@ -180,7 +185,7 @@ describe('app (integration)', () => {
       method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: cA },
       body: JSON.stringify({ courseId: 'c', title: 't', description: 'd', dueDate: '2026-06-01T12:00:00.000Z', status: 'active' }),
     });
-    const evalId = (await create.json()).evaluation.evaluationId;
+    const evalId = (await create.json() as any).evaluation.evaluationId;
 
     const sB = await app.request('/api/auth/signup', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -202,6 +207,6 @@ describe('app (integration)', () => {
       body: JSON.stringify({ email: 'not-email', password: 'short', name: '' }),
     });
     expect(r.status).toBe(400);
-    expect((await r.json()).error.code).toBe('VALIDATION_ERROR');
+    expect((await r.json() as any).error.code).toBe('VALIDATION_ERROR');
   });
 });
