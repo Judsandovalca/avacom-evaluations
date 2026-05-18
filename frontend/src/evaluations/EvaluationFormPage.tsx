@@ -1,0 +1,63 @@
+// src/evaluations/EvaluationFormPage.tsx
+import { useNavigate, useParams } from 'react-router-dom';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { EvaluationForm } from './EvaluationForm';
+import { useEvaluation } from './hooks/useEvaluation';
+import { useCreateEvaluation } from './hooks/useCreateEvaluation';
+import { useUpdateEvaluation } from './hooks/useUpdateEvaluation';
+import { useToast } from '../components/ToastProvider';
+import type { EvaluationFormInput } from '../lib/schemas';
+
+interface Props { mode: 'create' | 'edit'; }
+
+export function EvaluationFormPage({ mode }: Props) {
+  const params = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { show } = useToast();
+  const id = params.id ?? '';
+
+  const eval$ = useEvaluation(mode === 'edit' ? id : '');
+  const createMut = useCreateEvaluation();
+  const updateMut = useUpdateEvaluation();
+
+  if (mode === 'edit' && eval$.isLoading) return <LoadingSpinner />;
+  if (mode === 'edit' && eval$.isError) return <p className="p-6 text-red-600">Could not load evaluation.</p>;
+
+  async function onSubmit(data: EvaluationFormInput) {
+    try {
+      if (mode === 'create') {
+        await createMut.mutateAsync(data);
+        show('Created', 'success');
+      } else {
+        await updateMut.mutateAsync({ id, patch: data });
+        show('Updated', 'success');
+      }
+      navigate('/evaluations');
+    } catch {
+      show('Save failed', 'error');
+    }
+  }
+
+  const initial: EvaluationFormInput | undefined = mode === 'edit' && eval$.data
+    ? {
+        courseId: eval$.data.courseId,
+        title: eval$.data.title,
+        description: eval$.data.description,
+        dueDate: eval$.data.dueDate.slice(0, 16),
+        status: eval$.data.status,
+      }
+    : undefined;
+
+  return (
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
+      <h1 className="text-2xl font-semibold text-slate-900">
+        {mode === 'create' ? 'New evaluation' : 'Edit evaluation'}
+      </h1>
+      <EvaluationForm
+        initialValues={initial}
+        submitting={createMut.isPending || updateMut.isPending}
+        onSubmit={onSubmit}
+      />
+    </div>
+  );
+}
