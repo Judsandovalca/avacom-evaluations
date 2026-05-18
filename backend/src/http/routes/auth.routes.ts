@@ -1,6 +1,7 @@
 // src/http/routes/auth.routes.ts
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
+import { throwOnInvalid } from '../validatorHook';
 import type { UserRepository } from '../../domain/user/UserRepository';
 import type { TokenService } from '../../domain/auth/TokenService';
 import { signUp, type Hasher } from '../../domain/use-cases/signUp';
@@ -20,7 +21,7 @@ export interface AuthDeps {
 export function buildAuthRoutes(deps: AuthDeps) {
   const r = new Hono();
 
-  r.post('/signup', zValidator('json', signupSchema), async (c) => {
+  r.post('/signup', zValidator('json', signupSchema, throwOnInvalid), async (c) => {
     const body = c.req.valid('json');
     const result = await signUp(deps)(body);
     c.header('Set-Cookie', buildSetAccessCookie(result.tokens.accessToken), { append: true });
@@ -28,7 +29,7 @@ export function buildAuthRoutes(deps: AuthDeps) {
     return c.json({ user: result.user }, 201);
   });
 
-  r.post('/login', zValidator('json', loginSchema), async (c) => {
+  r.post('/login', zValidator('json', loginSchema, throwOnInvalid), async (c) => {
     const body = c.req.valid('json');
     const result = await login(deps)(body);
     c.header('Set-Cookie', buildSetAccessCookie(result.tokens.accessToken), { append: true });

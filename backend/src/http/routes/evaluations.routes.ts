@@ -1,6 +1,7 @@
 // src/http/routes/evaluations.routes.ts
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
+import { throwOnInvalid } from '../validatorHook';
 import type { EvaluationRepository } from '../../domain/evaluation/EvaluationRepository';
 import { createEvaluation } from '../../domain/use-cases/createEvaluation';
 import { getEvaluation } from '../../domain/use-cases/getEvaluation';
@@ -17,7 +18,7 @@ type Vars = { Variables: { userId: string; userEmail: string } };
 export function buildEvaluationsRoutes(deps: EvaluationsDeps) {
   const r = new Hono<Vars>();
 
-  r.get('/', zValidator('query', listEvaluationsQuerySchema), async (c) => {
+  r.get('/', zValidator('query', listEvaluationsQuerySchema, throwOnInvalid), async (c) => {
     const userId = c.get('userId');
     const q = c.req.valid('query');
     const result = await listEvaluations(deps)({ userId, ...q });
@@ -32,14 +33,14 @@ export function buildEvaluationsRoutes(deps: EvaluationsDeps) {
     return c.json({ evaluation });
   });
 
-  r.post('/', zValidator('json', createEvaluationSchema), async (c) => {
+  r.post('/', zValidator('json', createEvaluationSchema, throwOnInvalid), async (c) => {
     const userId = c.get('userId');
     const body = c.req.valid('json');
     const evaluation = await createEvaluation(deps)({ userId, ...body });
     return c.json({ evaluation }, 201);
   });
 
-  r.put('/:id', zValidator('json', updateEvaluationSchema), async (c) => {
+  r.put('/:id', zValidator('json', updateEvaluationSchema, throwOnInvalid), async (c) => {
     const userId = c.get('userId');
     const patch = c.req.valid('json');
     const evaluation = await updateEvaluation(deps)({
