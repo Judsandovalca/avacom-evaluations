@@ -1,0 +1,1169 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AVACOM — Architecture Diagrams</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --border: #e6e6e8;
+    --border-strong: #d4d4d8;
+    --text: #1a1a1a;
+    --text-muted: #6b7280;
+    --text-faint: #9ca3af;
+    --accent: #5b5bd6;
+    --accent-soft: #eef0fc;
+    --code-bg: #f5f5f7;
+    --code-text: #383a42;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --radius: 8px;
+    --sidebar-w: 280px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0c;
+      --surface: #131316;
+      --border: #26262a;
+      --border-strong: #34343a;
+      --text: #ededee;
+      --text-muted: #9d9da3;
+      --text-faint: #6b6b72;
+      --accent: #8b8cf7;
+      --accent-soft: #1c1c3a;
+      --code-bg: #1a1a1d;
+      --code-text: #d4d4d8;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, pre {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 13px;
+  }
+
+  /* Layout */
+  .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    min-height: 100vh;
+  }
+  aside {
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    padding: 28px 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  aside .brand {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  aside .brand small {
+    display: block;
+    font-weight: 400;
+    color: var(--text-muted);
+    font-size: 12px;
+    letter-spacing: 0;
+    margin-top: 2px;
+  }
+  aside nav {
+    margin-top: 28px;
+  }
+  aside nav .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    font-weight: 600;
+    margin: 0 0 10px 8px;
+  }
+  aside nav ol {
+    list-style: none;
+    margin: 0; padding: 0;
+    counter-reset: navc;
+  }
+  aside nav ol li {
+    counter-increment: navc;
+  }
+  aside nav a {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    text-decoration: none;
+    color: var(--text-muted);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    line-height: 1.4;
+    transition: background 120ms ease, color 120ms ease;
+  }
+  aside nav a:hover {
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+  aside nav a.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  aside nav a::before {
+    content: "0" counter(navc);
+    color: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    min-width: 22px;
+  }
+  aside .footer {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  main {
+    padding: 56px 56px 120px;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  /* Headings & text */
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 56px 0 8px;
+    letter-spacing: -0.01em;
+    scroll-margin-top: 24px;
+  }
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 32px 0 8px;
+  }
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 20px 0 6px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  p { margin: 0 0 14px; color: var(--text); }
+  .lead { color: var(--text-muted); font-size: 16px; max-width: 72ch; }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* Section header */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 72px;
+    margin-bottom: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    scroll-margin-top: 24px;
+  }
+  .section-head:first-of-type {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+  }
+  .section-head .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+  .section-head h2 {
+    margin: 0;
+  }
+
+  /* Diagram card */
+  .diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin: 20px 0 28px;
+    box-shadow: var(--shadow-sm);
+    overflow: auto;
+    position: relative;
+  }
+  .diagram .toolbar {
+    position: absolute;
+    top: 12px; right: 12px;
+    display: flex; gap: 6px;
+    opacity: 0; transition: opacity 150ms;
+  }
+  .diagram:hover .toolbar { opacity: 1; }
+  .diagram button {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 120ms;
+  }
+  .diagram button:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .mermaid {
+    display: flex;
+    justify-content: center;
+    min-height: 100px;
+  }
+  .mermaid svg { max-width: 100%; height: auto; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--code-bg);
+  }
+  tr:last-child td { border-bottom: none; }
+  td code { white-space: nowrap; }
+
+  /* Lists */
+  ul, ol { padding-left: 22px; margin: 0 0 16px; }
+  li { margin-bottom: 6px; }
+  ul li::marker { color: var(--text-faint); }
+
+  /* Inline code */
+  :not(pre) > code {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    border: 1px solid var(--border);
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 12px 0 20px;
+    line-height: 1.55;
+  }
+  pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--code-text);
+    font-size: 13px;
+  }
+
+  /* Callouts */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 14px 18px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+  .callout strong { color: var(--accent); }
+
+  /* Strong */
+  strong { font-weight: 600; }
+
+  /* Modal for zoomed diagrams */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  .modal.open { display: flex; }
+  .modal-inner {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 40px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    border-radius: 6px;
+    width: 32px; height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .modal-inner svg {
+    max-width: none !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  @media (max-width: 920px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    main { padding: 32px 20px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside>
+    <div class="brand">
+      AVACOM
+      <small>Architecture diagrams</small>
+    </div>
+
+    <nav>
+      <div class="label">Diagrams</div>
+      <ol>
+        <li><a href="#sec-1" data-target="sec-1">System architecture</a></li>
+        <li><a href="#sec-2" data-target="sec-2">Hexagonal (ports &amp; adapters)</a></li>
+        <li><a href="#sec-3" data-target="sec-3">Auth flow sequences</a></li>
+        <li><a href="#sec-4" data-target="sec-4">CRUD request lifecycle</a></li>
+        <li><a href="#sec-5" data-target="sec-5">Data model (DynamoDB)</a></li>
+        <li><a href="#sec-6" data-target="sec-6">Frontend component tree</a></li>
+      </ol>
+    </nav>
+
+    <div class="footer">
+      Hover any diagram and click <em>Zoom</em> to view full size.
+    </div>
+  </aside>
+
+  <main>
+    <h1>Architecture diagrams</h1>
+    <p class="lead">Six diagrams describing the AVACOM system from different angles. All written in Mermaid and rendered here as live SVG.</p>
+
+    <h3>Demo walkthrough order (10 min)</h3>
+    <table>
+      <thead><tr><th>#</th><th>Diagram</th><th>Why</th><th>Time</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><a href="#sec-1">System architecture</a></td><td>What's deployed and how it connects</td><td>90s</td></tr>
+        <tr><td>2</td><td><a href="#sec-2">Hexagonal</a></td><td>Import direction rule; domain has no AWS imports</td><td>2m</td></tr>
+        <tr><td>3</td><td><a href="#sec-4">CRUD lifecycle</a></td><td>Trace one request form → DynamoDB → back</td><td>3m</td></tr>
+        <tr><td>4</td><td><a href="#sec-3">Auth flow</a></td><td>Defend stateless refresh + httpOnly cookie design</td><td>2m</td></tr>
+        <tr><td>5</td><td><a href="#sec-5">Data model</a></td><td>GSI and how access patterns map</td><td>1m</td></tr>
+        <tr><td>6</td><td><a href="#sec-6">Frontend tree</a></td><td>Hook + page separation</td><td>30s</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <div class="section-head" id="sec-1">
+      <span class="num">01</span>
+      <h2>System architecture</h2>
+    </div>
+    <p>High-level view of all AWS services, their connections, and request flow.</p>
+
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+graph TB
+    User([User Browser])
+
+    subgraph CloudFront["AWS CloudFront — d1xxx.cloudfront.net"]
+        CFDist[CloudFront Distribution<br/>HTTPS + Security Headers]
+        CFBehavior1{Path-based<br/>routing}
+    end
+
+    subgraph S3Stack["S3"]
+        S3[S3 Bucket — private<br/>React build artifacts]
+        OAC[Origin Access Control]
+    end
+
+    subgraph APIStack["API Layer"]
+        APIGW[API Gateway HTTP API<br/>Throttling: 50 req/s]
+        Lambda[AWS Lambda<br/>Node.js 20 + Hono<br/>512 MB / 10s timeout]
+    end
+
+    subgraph DataStack["Data Layer"]
+        DDB1[(DynamoDB<br/>EvaluationsTable<br/>+ GSI userId-createdAt)]
+        DDB2[(DynamoDB<br/>UsersTable<br/>PK: email)]
+    end
+
+    subgraph SecretsStack["Secrets & Observability"]
+        SM[Secrets Manager<br/>JWT_SECRET]
+        CW[CloudWatch<br/>Logs + Metrics + X-Ray]
+    end
+
+    User -->|HTTPS| CFDist
+    CFDist --> CFBehavior1
+    CFBehavior1 -->|/*| OAC
+    OAC --> S3
+    CFBehavior1 -->|/api/*| APIGW
+    APIGW --> Lambda
+    Lambda --> DDB1
+    Lambda --> DDB2
+    Lambda -.reads.-> SM
+    Lambda -.logs/traces/metrics.-> CW
+
+    classDef aws fill:#FF9900,stroke:#232F3E,color:#fff
+    classDef data fill:#3B48CC,stroke:#232F3E,color:#fff
+    classDef obs fill:#759C3E,stroke:#232F3E,color:#fff
+    class CFDist,CFBehavior1,S3,OAC,APIGW,Lambda aws
+    class DDB1,DDB2 data
+    class SM,CW obs
+      </div>
+    </div>
+
+    <h3>Key design points</h3>
+    <ul>
+      <li><strong>Single origin (CloudFront)</strong> — frontend and <code>/api/*</code> share one domain → <code>SameSite=Strict</code> cookies work, zero CORS configuration</li>
+      <li><strong>Private S3 + OAC</strong> — bucket has Block Public Access ON; only CloudFront can read via signed Origin Access Control</li>
+      <li><strong>One Lambda</strong> — single function handles all routes via Hono router; hexagonal composition wired once at cold start</li>
+      <li><strong>Multi-table DynamoDB</strong> — Users and Evaluations are independent aggregates; multi-table chosen for readability over single-table design</li>
+      <li><strong>Secrets Manager</strong> — JWT signing key stored as auto-generated secret; rotated independently of code deploys</li>
+      <li><strong>CloudWatch</strong> — structured JSON logs (Lambda Powertools), X-Ray distributed tracing, custom metrics per endpoint</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <div class="section-head" id="sec-2">
+      <span class="num">02</span>
+      <h2>Hexagonal architecture (ports &amp; adapters)</h2>
+    </div>
+    <p>The backend follows Alistair Cockburn's hexagonal architecture: the <strong>domain</strong> is pure business logic with no awareness of AWS, HTTP, or databases. It communicates with the outside world through <strong>ports</strong> (interfaces), and concrete <strong>adapters</strong> implement those ports.</p>
+
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+graph TB
+    subgraph DrivingSide["DRIVING SIDE (input)"]
+        HTTP[HTTP Adapter<br/>Hono routes<br/>Zod validation<br/>Auth middleware]
+    end
+
+    subgraph Core["DOMAIN CORE — pure, no I/O"]
+        UseCases[Use Cases<br/>signUp · login · refreshToken<br/>createEvaluation · listEvaluations<br/>updateEvaluation · deleteEvaluation<br/>getEvaluation · getCurrentUser]
+        Entities[Entities<br/>Evaluation · User]
+        Ports[Ports interfaces<br/>EvaluationRepository<br/>UserRepository<br/>TokenService]
+    end
+
+    subgraph DrivenSide["DRIVEN SIDE output"]
+        DynamoEval[DynamoEvaluation<br/>Repository]
+        DynamoUser[DynamoUser<br/>Repository]
+        JwtSvc[JwtTokenService<br/>uses 'jose' lib]
+    end
+
+    DynamoDB[(DynamoDB)]
+    SecretsManager[(Secrets Manager)]
+
+    HTTP -->|invokes| UseCases
+    UseCases -->|uses| Entities
+    UseCases -->|depends on| Ports
+
+    Ports -.implemented by.-> DynamoEval
+    Ports -.implemented by.-> DynamoUser
+    Ports -.implemented by.-> JwtSvc
+
+    DynamoEval --> DynamoDB
+    DynamoUser --> DynamoDB
+    JwtSvc -.reads secret.-> SecretsManager
+
+    classDef domain fill:#90EE90,stroke:#2D5016,color:#000,stroke-width:2px
+    classDef port fill:#FFE4B5,stroke:#8B4513,color:#000,stroke-width:2px
+    classDef adapter fill:#ADD8E6,stroke:#00008B,color:#000
+    classDef external fill:#D3D3D3,stroke:#000,color:#000
+
+    class UseCases,Entities domain
+    class Ports port
+    class HTTP,DynamoEval,DynamoUser,JwtSvc adapter
+    class DynamoDB,SecretsManager external
+      </div>
+    </div>
+
+    <h3>Why hexagonal here</h3>
+    <table>
+      <thead><tr><th>Benefit</th><th>How it pays off</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Domain has zero AWS imports</strong></td><td>Use cases are pure TypeScript — testable without mocking AWS SDK</td></tr>
+        <tr><td><strong>Live demo: swap an adapter</strong></td><td>If reviewer asks "what if we switch to PostgreSQL?", delete <code>DynamoEvaluationRepository</code>, write <code>PostgresEvaluationRepository</code>, change one line in <code>composition.ts</code>. Domain untouched.</td></tr>
+        <tr><td><strong>Live demo: add a field</strong></td><td>Touches <code>Evaluation.ts</code> entity + <code>schemas.ts</code> Zod schema. Repository persists whatever the entity has.</td></tr>
+        <tr><td><strong>Tests run fast</strong></td><td>Domain unit tests have no I/O, no Docker, no mocks — pure function calls.</td></tr>
+        <tr><td><strong>Composition root pattern</strong></td><td><code>composition.ts</code> is the ONLY file that knows how the pieces fit. Swapping implementations or wiring test doubles happens in one place.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Dependency direction (the critical rule)</h3>
+    <p><strong>All arrows point INWARD toward the domain.</strong> The domain never imports from <code>adapters/</code> or <code>http/</code>. Enforced by:</p>
+    <ul>
+      <li>ESLint <code>no-restricted-imports</code> blocks <code>domain/*</code> from importing <code>adapters/*</code>, <code>http/*</code>, or <code>@aws-sdk/*</code></li>
+      <li>Folder convention: anything in <code>domain/</code> is pure; anything that touches I/O lives in <code>adapters/</code></li>
+    </ul>
+
+    <h3>File-level example</h3>
+    <pre><code>// domain/evaluation/EvaluationRepository.ts (PORT — interface only)
+export interface EvaluationRepository {
+  save(e: Evaluation): Promise&lt;void&gt;;
+  findById(id: string): Promise&lt;Evaluation | null&gt;;
+  listByUser(userId: string, filters: ListFilters): Promise&lt;PaginatedResult&gt;;
+  update(id: string, patch: Partial&lt;Evaluation&gt;, expectedUserId: string): Promise&lt;Evaluation&gt;;
+  softDelete(id: string, expectedUserId: string): Promise&lt;void&gt;;
+}
+
+// adapters/persistence/DynamoEvaluationRepository.ts (ADAPTER)
+export class DynamoEvaluationRepository implements EvaluationRepository {
+  constructor(private tableName: string, private client = ddbDocClient) {}
+  async save(e: Evaluation) { /* PutCommand */ }
+  async findById(id: string) { /* GetCommand */ }
+  // ...
+}
+
+// domain/use-cases/createEvaluation.ts (USE CASE — no AWS, no HTTP)
+export function createEvaluation(deps: { repo: EvaluationRepository }) {
+  return async (input: CreateInput) =&gt; {
+    const evaluation = Evaluation.create(input);
+    await deps.repo.save(evaluation);
+    return evaluation;
+  };
+}
+
+// composition.ts (COMPOSITION ROOT — wiring)
+const repo = new DynamoEvaluationRepository(process.env.EVALUATIONS_TABLE!);
+const createUseCase = createEvaluation({ repo });
+// then injected into Hono routes</code></pre>
+
+    <!-- ============================================================ -->
+    <div class="section-head" id="sec-3">
+      <span class="num">03</span>
+      <h2>Auth flow sequences</h2>
+    </div>
+    <p>Four critical auth flows: <strong>signup</strong>, <strong>login</strong>, <strong>authenticated request with auto-refresh</strong>, and <strong>logout</strong>.</p>
+
+    <h3>1. Signup</h3>
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+sequenceDiagram
+    actor U as User
+    participant FE as React App
+    participant CF as CloudFront
+    participant API as API Gateway
+    participant L as Lambda (Hono)
+    participant DDB as UsersTable
+
+    U->>FE: Fills signup form<br/>(email, password, name)
+    FE->>FE: Client validation (Zod)
+    FE->>CF: POST /api/auth/signup<br/>(JSON body)
+    CF->>API: forward
+    API->>L: invoke
+    L->>L: Validate body (Zod)
+    L->>L: Hash password (bcrypt, 10 rounds)
+    L->>DDB: PutItem(email, userId, passwordHash, name)<br/>ConditionExpression: attribute_not_exists(email)
+    alt Email already exists
+        DDB-->>L: ConditionalCheckFailedException
+        L-->>FE: 409 CONFLICT
+        FE-->>U: "Email already registered"
+    else Success
+        DDB-->>L: OK
+        L->>L: Sign access_token (JWT, TTL 15m)<br/>Sign refresh_token (JWT, TTL 7d)
+        L-->>FE: 201 + Set-Cookie x2<br/>{user: {userId, email, name}}
+        FE->>FE: Store user in AuthContext
+        FE-->>U: Redirect to /evaluations
+    end
+      </div>
+    </div>
+
+    <h3>2. Login</h3>
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+sequenceDiagram
+    actor U as User
+    participant FE as React App
+    participant L as Lambda
+    participant DDB as UsersTable
+
+    U->>FE: Fills login form
+    FE->>L: POST /api/auth/login {email, password}
+    L->>DDB: GetItem(email)
+    alt User not found
+        DDB-->>L: null
+        L-->>FE: 401 UNAUTHORIZED<br/>"Invalid credentials"
+    else User found
+        DDB-->>L: {userId, passwordHash, ...}
+        L->>L: bcrypt.compare(password, passwordHash)
+        alt Bad password
+            L-->>FE: 401 UNAUTHORIZED<br/>"Invalid credentials"
+        else Match
+            L->>L: Sign tokens (access 15m + refresh 7d)
+            L-->>FE: 200 + Set-Cookie x2 + {user}
+            FE-->>U: Redirect to /evaluations
+        end
+    end
+
+    note over L: Same error message for "user not found" and<br/>"bad password" prevents email enumeration
+      </div>
+    </div>
+
+    <h3>3. Authenticated request with auto-refresh</h3>
+    <p>This is the most important flow — defends decision §2.6 (stateless refresh).</p>
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+sequenceDiagram
+    participant FE as React App<br/>(Axios)
+    participant L as Lambda
+    participant Mid as authMiddleware
+    participant UC as Use Case
+    participant DDB as DynamoDB
+
+    note over FE: Cookies auto-attached:<br/>access_token + refresh_token
+
+    FE->>L: GET /api/evaluations
+    L->>Mid: route hits middleware
+    Mid->>Mid: Read access_token cookie
+    Mid->>Mid: Verify JWT signature<br/>(jose, HS256, secret from env)
+
+    alt Token valid
+        Mid->>Mid: Extract userId, set c.var.userId
+        Mid->>UC: invoke listEvaluations({userId, filters})
+        UC->>DDB: Query GSI (userId-createdAt-index)<br/>+ FilterExpression for status
+        DDB-->>UC: items
+        UC-->>L: PaginatedResult
+        L-->>FE: 200 {items, nextCursor}
+
+    else Access token expired (401)
+        Mid-->>FE: 401 UNAUTHORIZED
+        note over FE: Axios interceptor catches 401
+        FE->>FE: Check: original request<br/>not already retried?
+        FE->>L: POST /api/auth/refresh<br/>(refresh_token cookie)
+        L->>L: Verify refresh JWT signature
+        alt Refresh valid
+            L->>L: Sign new access_token
+            L-->>FE: 200 + Set-Cookie access_token
+            FE->>L: RETRY original GET /api/evaluations
+            L-->>FE: 200 {items}
+        else Refresh expired/invalid
+            L-->>FE: 401
+            FE->>FE: Clear AuthContext
+            FE-->>FE: Redirect to /login
+        end
+    end
+      </div>
+    </div>
+
+    <h4>Why this flow is safe (Q&amp;A defense)</h4>
+    <ul>
+      <li><strong>httpOnly cookies</strong> → JavaScript cannot read them; XSS payloads cannot exfiltrate tokens</li>
+      <li><strong>SameSite=Strict</strong> → browser refuses to send cookies on cross-site requests; CSRF impossible</li>
+      <li><strong>Secure</strong> → only sent over HTTPS (enforced by CloudFront)</li>
+      <li><strong>Same-origin topology</strong> → no <code>Access-Control-Allow-Credentials</code> needed, no preflight churn</li>
+      <li><strong>Stateless refresh</strong> → no DB lookup on every refresh; signature verification only</li>
+      <li><strong>Short access TTL (15m)</strong> → window of exposure if a token leaks is bounded</li>
+      <li><strong>Idempotent refresh</strong> → axios interceptor uses a single-flight promise so concurrent 401s share one refresh call</li>
+    </ul>
+
+    <h3>4. Logout</h3>
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+sequenceDiagram
+    actor U as User
+    participant FE as React App
+    participant L as Lambda
+
+    U->>FE: Clicks "Logout"
+    FE->>L: POST /api/auth/logout
+    L-->>FE: 204 + Set-Cookie<br/>access_token=; Max-Age=0<br/>refresh_token=; Max-Age=0
+    FE->>FE: Clear AuthContext<br/>queryClient.clear()
+    FE-->>U: Redirect to /login
+
+    note over L: Logout is decorative on the server side.<br/>Tokens remain technically valid until TTL expires,<br/>but the client has no way to present them again.<br/>If forced server-side invalidation were needed,<br/>we would add a RefreshTokens table (decision §2.6).
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <div class="section-head" id="sec-4">
+      <span class="num">04</span>
+      <h2>CRUD request lifecycle</h2>
+    </div>
+    <p>How a single request flows through every architectural layer. This diagram is what you walk the reviewer through during the demo to show separation of concerns.</p>
+
+    <h3>Example: <code>POST /api/evaluations</code></h3>
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+sequenceDiagram
+    actor U as User
+    participant FE as React Form
+    participant Hook as useCreateEvaluation
+    participant Axios as Axios + Interceptor
+    participant CF as CloudFront
+    participant API as API Gateway
+    participant H as handler.ts<br/>(Hono entry)
+    participant LM as loggerMiddleware
+    participant AM as authMiddleware
+    participant EM as errorHandler
+    participant R as evaluations.routes.ts
+    participant V as Zod validator
+    participant UC as createEvaluation<br/>(use case)
+    participant Repo as EvaluationRepo<br/>(port)
+    participant Dyn as DynamoEvaluationRepo<br/>(adapter)
+    participant DDB as DynamoDB
+
+    U->>FE: Fills form, clicks Save
+    FE->>FE: react-hook-form + Zod validation
+    FE->>Hook: mutation.mutate(formData)
+    Hook->>Axios: api.post('/evaluations', body)
+    Axios->>CF: HTTPS POST /api/evaluations<br/>Cookies: access_token + refresh_token
+    CF->>API: forward (/api/* behavior, no cache)
+    API->>H: Lambda invocation event
+    H->>LM: Generate correlationId, log request
+    LM->>AM: continue
+    AM->>AM: Parse access_token cookie
+    AM->>AM: jose.jwtVerify(token, secret)
+    AM->>AM: c.set('userId', payload.sub)
+    AM->>R: continue to route
+    R->>V: zValidator('json', createEvaluationSchema)
+    alt Body invalid
+        V-->>EM: ZodError
+        EM-->>FE: 400 {error: VALIDATION_ERROR, details}
+        FE-->>U: Inline form errors
+    else Valid
+        V->>R: validated body
+        R->>UC: createEvaluation(deps)<br/>({userId, ...body})
+        UC->>UC: build Evaluation entity<br/>(uuid, timestamps, deletedAt: null)
+        UC->>Repo: repo.save(evaluation)
+        Repo->>Dyn: DynamoEvaluationRepository.save
+        Dyn->>DDB: PutCommand<br/>ConditionExpression: attribute_not_exists(evaluationId)
+        DDB-->>Dyn: 200 OK
+        Dyn-->>UC: void
+        UC-->>R: evaluation
+        R-->>H: c.json(evaluation, 201)
+        H->>LM: log response, status, latency
+        H-->>API: 201 + body
+        API-->>CF: forward
+        CF-->>Axios: 201 {evaluation}
+        Axios-->>Hook: response
+        Hook->>Hook: queryClient.invalidateQueries(['evaluations'])
+        Hook-->>FE: success
+        FE->>FE: Toast "Created!"<br/>Navigate to /evaluations
+    end
+
+    note over LM,EM: Logs flushed to CloudWatch:<br/>{correlationId, userId, route, status, durationMs}
+      </div>
+    </div>
+
+    <h3>What each layer does (and doesn't)</h3>
+    <table>
+      <thead><tr><th>Layer</th><th>Responsibility</th><th>Does NOT</th></tr></thead>
+      <tbody>
+        <tr><td><strong>React Form</strong></td><td>Capture user input, client-side validation</td><td>Know about HTTP details</td></tr>
+        <tr><td><strong>Hook (TanStack Query)</strong></td><td>Mutation, cache invalidation, optimistic updates</td><td>Know about auth/refresh</td></tr>
+        <tr><td><strong>Axios + interceptor</strong></td><td>HTTP transport, automatic token refresh on 401</td><td>Know about business logic</td></tr>
+        <tr><td><strong>CloudFront</strong></td><td>TLS termination, routing by path, security headers</td><td>Touch business logic</td></tr>
+        <tr><td><strong>API Gateway</strong></td><td>Throttling, request transformation, Lambda invocation</td><td>Touch business logic</td></tr>
+        <tr><td><strong>handler.ts</strong></td><td>Lambda entry, Hono dispatch</td><td>Know about specific use cases</td></tr>
+        <tr><td><strong>loggerMiddleware</strong></td><td>Correlation ID, structured request/response logs</td><td>Touch business logic</td></tr>
+        <tr><td><strong>authMiddleware</strong></td><td>Verify JWT, extract userId</td><td>Decide who can do what</td></tr>
+        <tr><td><strong>Route handler</strong></td><td>Validate input (Zod), call use case, map response</td><td>Contain business rules</td></tr>
+        <tr><td><strong>Use case</strong></td><td>Orchestrate business logic, enforce invariants</td><td>Know about HTTP, DynamoDB</td></tr>
+        <tr><td><strong>Port (interface)</strong></td><td>Define what the domain needs from persistence</td><td>Contain implementation</td></tr>
+        <tr><td><strong>Adapter (DynamoRepo)</strong></td><td>Translate domain operations to DynamoDB calls</td><td>Contain business logic</td></tr>
+        <tr><td><strong>DynamoDB</strong></td><td>Store and query data</td><td>Validate business rules</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>For the demo:</strong> point at this diagram and trace the entire path in 90 seconds. "What if validation rules change?" → <code>schemas.ts</code>. "What if we switched databases?" → <code>DynamoEvaluationRepository</code> only; domain wouldn't change.
+    </div>
+
+    <!-- ============================================================ -->
+    <div class="section-head" id="sec-5">
+      <span class="num">05</span>
+      <h2>Data model (DynamoDB)</h2>
+    </div>
+    <p>Multi-table design — Users and Evaluations are independent aggregates.</p>
+
+    <h3>ER diagram</h3>
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+erDiagram
+    USERS ||--o{ EVALUATIONS : owns
+
+    USERS {
+        string email PK "login lookup"
+        string userId "UUID v4 — used in JWT sub"
+        string passwordHash "bcrypt, 10 rounds"
+        string name
+        string createdAt "ISO 8601"
+    }
+
+    EVALUATIONS {
+        string evaluationId PK "UUID v4"
+        string userId FK "owner, via GSI"
+        string courseId "filterable"
+        string title
+        string description
+        string dueDate "ISO 8601"
+        string status "active|completed|cancelled"
+        string createdAt "ISO 8601 — GSI sort key"
+        string updatedAt "ISO 8601"
+        string deletedAt "ISO 8601 or null — soft delete"
+    }
+      </div>
+    </div>
+
+    <h3><code>EvaluationsTable</code></h3>
+    <table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td><code>evaluationId</code></td><td>String</td><td><strong>Primary key (HASH)</strong></td></tr>
+        <tr><td><code>userId</code></td><td>String</td><td>GSI hash key</td></tr>
+        <tr><td><code>courseId</code></td><td>String</td><td>filterable</td></tr>
+        <tr><td><code>title</code></td><td>String</td><td></td></tr>
+        <tr><td><code>description</code></td><td>String</td><td></td></tr>
+        <tr><td><code>dueDate</code></td><td>String</td><td>ISO 8601</td></tr>
+        <tr><td><code>status</code></td><td>String</td><td>enum</td></tr>
+        <tr><td><code>createdAt</code></td><td>String</td><td>GSI range key</td></tr>
+        <tr><td><code>updatedAt</code></td><td>String</td><td></td></tr>
+        <tr><td><code>deletedAt</code></td><td>String | null</td><td>soft delete</td></tr>
+      </tbody>
+    </table>
+
+    <h4>GSI: <code>userId-createdAt-index</code></h4>
+    <table>
+      <thead><tr><th>Attribute</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td><code>userId</code></td><td>HASH (partition key)</td></tr>
+        <tr><td><code>createdAt</code></td><td>RANGE (sort key)</td></tr>
+        <tr><td>Projection</td><td>ALL</td></tr>
+      </tbody>
+    </table>
+
+    <h3><code>UsersTable</code></h3>
+    <table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td><code>email</code></td><td>String</td><td><strong>Primary key (HASH)</strong> — direct lookup on login</td></tr>
+        <tr><td><code>userId</code></td><td>String</td><td>UUID v4, referenced by JWT and EvaluationsTable</td></tr>
+        <tr><td><code>passwordHash</code></td><td>String</td><td>bcrypt</td></tr>
+        <tr><td><code>name</code></td><td>String</td><td></td></tr>
+        <tr><td><code>createdAt</code></td><td>String</td><td></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Access pattern matrix</h3>
+    <table>
+      <thead><tr><th>Use case</th><th>Operation</th><th>Index</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Signup</td><td><code>PutItem</code> on Users</td><td>base</td><td><code>ConditionExpression: attribute_not_exists(email)</code> → 409 on duplicate</td></tr>
+        <tr><td>Login</td><td><code>GetItem</code> on Users</td><td>base</td><td>by <code>email</code></td></tr>
+        <tr><td>Get current user</td><td><code>GetItem</code> on Users</td><td>base</td><td>by <code>email</code> from JWT</td></tr>
+        <tr><td>Create evaluation</td><td><code>PutItem</code> on Evaluations</td><td>base</td><td><code>ConditionExpression: attribute_not_exists(evaluationId)</code></td></tr>
+        <tr><td>Get evaluation</td><td><code>GetItem</code> on Evaluations</td><td>base</td><td>by <code>evaluationId</code>; use case checks <code>userId</code> matches token</td></tr>
+        <tr><td>List user's evaluations</td><td><code>Query</code> on Evaluations</td><td><strong>GSI</strong></td><td>hash=<code>userId</code>, newest first, FilterExpression for <code>status</code>, <code>courseId</code>, <code>deletedAt = null</code>, pagination via <code>ExclusiveStartKey</code></td></tr>
+        <tr><td>Update evaluation</td><td><code>UpdateItem</code> on Evaluations</td><td>base</td><td><code>ConditionExpression: userId = :uid AND attribute_not_exists(deletedAt)</code></td></tr>
+        <tr><td>Soft delete</td><td><code>UpdateItem</code> on Evaluations</td><td>base</td><td><code>SET deletedAt = :now</code> with ownership guard</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Why this design</h3>
+    <table>
+      <thead><tr><th>Decision</th><th>Reasoning</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Email as PK on Users</strong></td><td>Login is the dominant access pattern; direct <code>GetItem</code> avoids a GSI</td></tr>
+        <tr><td><strong>GSI on userId+createdAt</strong></td><td>All list operations are user-scoped and want newest first</td></tr>
+        <tr><td><strong>FilterExpression for status/courseId</strong></td><td>Low-cardinality filters; at scale we'd consider sparse indexes, here FilterExpression is correct and cheap</td></tr>
+        <tr><td><strong>Soft delete via deletedAt</strong></td><td>Allows recovery, audit, and reporting without a separate archive table</td></tr>
+        <tr><td><strong>No relationships enforced</strong></td><td>DynamoDB is not relational; ownership enforced at the use-case layer</td></tr>
+        <tr><td><strong>No RefreshTokens table</strong></td><td>See decision §2.6 — stateless refresh tokens</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Capacity &amp; cost</h3>
+    <ul>
+      <li><strong>Billing mode:</strong> <code>PAY_PER_REQUEST</code> (on-demand) — Free Tier covers up to 25 WCU + 25 RCU equivalents for the first 12 months</li>
+      <li><strong>Estimated cost:</strong> $0 for the test (well under Free Tier)</li>
+      <li><strong>TTL:</strong> none on either table</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <div class="section-head" id="sec-6">
+      <span class="num">06</span>
+      <h2>Frontend component tree</h2>
+    </div>
+    <p>React app structure showing component hierarchy, contexts, and data flow.</p>
+
+    <div class="diagram">
+      <div class="toolbar"><button onclick="zoom(this)">Zoom</button></div>
+      <div class="mermaid">
+graph TB
+    Main[main.tsx]
+    App[App.tsx]
+    QP[QueryClientProvider]
+    AP[AuthProvider]
+    BR[BrowserRouter]
+    EB[ErrorBoundary]
+
+    Routes{Routes}
+    Login[LoginPage]
+    Signup[SignupPage]
+    Protected[ProtectedRoute]
+    NotFound[NotFoundPage]
+
+    List[EvaluationsListPage]
+    FormCreate[EvaluationFormPage<br/>mode=create]
+    FormEdit[EvaluationFormPage<br/>mode=edit]
+
+    subgraph ListChildren[List page]
+        FiltersBar[FiltersBar]
+        Table[EvaluationsTable]
+        DeleteDlg[DeleteConfirmDialog]
+        Pagination[PaginationButton]
+    end
+
+    subgraph FormChildren[Form page]
+        EvalForm[EvaluationForm]
+    end
+
+    subgraph Atoms[Atomic components]
+        Button[Button]
+        Input[Input]
+        Select[Select]
+        Modal[Modal]
+        Toast[Toast]
+        Spinner[LoadingSpinner]
+    end
+
+    subgraph Hooks[Custom hooks]
+        useAuth[useAuth]
+        useEvals[useEvaluations]
+        useEval[useEvaluation]
+        useCreate[useCreateEvaluation]
+        useUpdate[useUpdateEvaluation]
+        useDelete[useDeleteEvaluation]
+    end
+
+    Main --> App
+    App --> EB
+    EB --> QP
+    QP --> AP
+    AP --> BR
+    BR --> Routes
+
+    Routes --> Login
+    Routes --> Signup
+    Routes --> Protected
+    Routes --> NotFound
+
+    Protected --> List
+    Protected --> FormCreate
+    Protected --> FormEdit
+
+    List --> FiltersBar
+    List --> Table
+    List --> DeleteDlg
+    List --> Pagination
+    FormCreate --> EvalForm
+    FormEdit --> EvalForm
+
+    List -.uses.-> useEvals
+    List -.uses.-> useDelete
+    FormCreate -.uses.-> useCreate
+    FormEdit -.uses.-> useEval
+    FormEdit -.uses.-> useUpdate
+    Login -.uses.-> useAuth
+    Signup -.uses.-> useAuth
+
+    classDef provider fill:#FFD700,stroke:#000,color:#000
+    classDef page fill:#87CEEB,stroke:#000,color:#000
+    classDef component fill:#98FB98,stroke:#000,color:#000
+    classDef hook fill:#FFA07A,stroke:#000,color:#000
+
+    class QP,AP,BR,EB provider
+    class Login,Signup,List,FormCreate,FormEdit,NotFound page
+    class FiltersBar,Table,DeleteDlg,EvalForm,Pagination component
+    class useAuth,useEvals,useEval,useCreate,useUpdate,useDelete hook
+      </div>
+    </div>
+
+    <h3>Provider chain (top to bottom)</h3>
+    <pre><code>&lt;ErrorBoundary&gt;           &larr; catches React render errors, shows fallback UI
+  &lt;QueryClientProvider&gt;   &larr; TanStack Query cache, dev tools
+    &lt;AuthProvider&gt;        &larr; Context: { user, isLoading, login, logout, signup }
+      &lt;BrowserRouter&gt;     &larr; React Router v6
+        &lt;Routes&gt;
+          ... pages
+        &lt;/Routes&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/AuthProvider&gt;
+  &lt;/QueryClientProvider&gt;
+&lt;/ErrorBoundary&gt;</code></pre>
+
+    <h3>Routing rules</h3>
+    <table>
+      <thead><tr><th>Path</th><th>Component</th><th>Guard</th></tr></thead>
+      <tbody>
+        <tr><td><code>/login</code></td><td><code>LoginPage</code></td><td>redirects to <code>/evaluations</code> if already authed</td></tr>
+        <tr><td><code>/signup</code></td><td><code>SignupPage</code></td><td>redirects to <code>/evaluations</code> if already authed</td></tr>
+        <tr><td><code>/</code></td><td>redirect to <code>/evaluations</code></td><td>–</td></tr>
+        <tr><td><code>/evaluations</code></td><td><code>EvaluationsListPage</code></td><td>wrapped in <code>&lt;ProtectedRoute&gt;</code></td></tr>
+        <tr><td><code>/evaluations/new</code></td><td><code>EvaluationFormPage</code> (create)</td><td>wrapped in <code>&lt;ProtectedRoute&gt;</code></td></tr>
+        <tr><td><code>/evaluations/:id/edit</code></td><td><code>EvaluationFormPage</code> (edit)</td><td>wrapped in <code>&lt;ProtectedRoute&gt;</code></td></tr>
+        <tr><td><code>*</code></td><td><code>NotFoundPage</code></td><td>–</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Data flow patterns</h3>
+
+    <h4>Reading</h4>
+    <pre><code>Page component &rarr; useEvaluations() hook &rarr; TanStack Query
+  &darr; (if not cached)
+QueryFn &rarr; api.get('/evaluations') &rarr; backend
+  &darr;
+Response cached + returned
+  &darr;
+Component re-renders with data, loading, error states</code></pre>
+
+    <h4>Writing</h4>
+    <pre><code>Form submit &rarr; useCreateEvaluation() mutation
+  &darr;
+mutation.mutate(formData)
+  &darr;
+api.post('/evaluations', data) &rarr; backend
+  &darr; on success
+queryClient.invalidateQueries(['evaluations']) &rarr; list refetches
+  &darr;
+toast.success("Created!") + navigate('/evaluations')</code></pre>
+
+    <h4>Auto-refresh on 401</h4>
+    <pre><code>Any request &rarr; 401 response
+  &darr;
+Axios response interceptor catches it
+  &darr;
+Single-flight: POST /auth/refresh (shared promise across concurrent 401s)
+  &darr; on success
+Retry the original request with new cookie
+  &darr; on failure
+authContext.logout() + redirect to /login</code></pre>
+
+    <h3>Why this structure</h3>
+    <ul>
+      <li><strong>Pages are thin</strong> — they compose hooks and components but contain no business logic</li>
+      <li><strong>Hooks own data fetching</strong> — every API interaction goes through a custom hook; components never call axios directly</li>
+      <li><strong>Atomic components</strong> — shared <code>Button</code>, <code>Input</code>, <code>Select</code>, <code>Modal</code> enforce consistent UI</li>
+      <li><strong>Single form for create/edit</strong> — <code>EvaluationForm</code> takes a <code>mode</code> prop and an optional <code>initialValues</code>; cuts maintenance in half</li>
+      <li><strong>Protected route HOC</strong> — auth check lives in one place; if <code>useAuth().user</code> is null, redirect to <code>/login</code></li>
+    </ul>
+
+  </main>
+</div>
+
+<div class="modal" id="modal" onclick="closeZoom(event)">
+  <div class="modal-inner" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeZoom()">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
+  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: dark ? 'dark' : 'default',
+    securityLevel: 'loose',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+    sequence: { useMaxWidth: true, mirrorActors: false, showSequenceNumbers: false },
+    er: { useMaxWidth: true }
+  });
+</script>
+
+<script>
+  // Active section in sidebar
+  const links = document.querySelectorAll('aside nav a');
+  const sections = Array.from(links).map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.dataset.target === entry.target.id));
+      }
+    });
+  }, { rootMargin: '-30% 0px -65% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  // Zoom diagrams
+  function zoom(btn) {
+    const card = btn.closest('.diagram');
+    const svg = card.querySelector('svg');
+    if (!svg) return;
+    const clone = svg.cloneNode(true);
+    const body = document.getElementById('modal-body');
+    body.innerHTML = '';
+    body.appendChild(clone);
+    document.getElementById('modal').classList.add('open');
+  }
+  function closeZoom(e) {
+    if (e && e.target.closest('.modal-inner') && !e.target.classList.contains('modal-close')) return;
+    document.getElementById('modal').classList.remove('open');
+  }
+  window.zoom = zoom;
+  window.closeZoom = closeZoom;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeZoom(); });
+</script>
+</body>
+</html>
