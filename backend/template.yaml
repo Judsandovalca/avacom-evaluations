@@ -10,7 +10,7 @@ Parameters:
 
 Globals:
   Function:
-    Runtime: nodejs20.x
+    Runtime: nodejs22.x
     Timeout: 10
     MemorySize: 512
     Architectures: [arm64]
