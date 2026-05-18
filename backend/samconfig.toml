@@ -7,5 +7,5 @@ resolve_s3 = true
 s3_prefix = "avacom"
 region = "us-east-1"
 capabilities = "CAPABILITY_IAM"
-confirm_changeset = true
+confirm_changeset = false
 fail_on_empty_changeset = false
