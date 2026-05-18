@@ -12,8 +12,9 @@ See [`docs/diagrams/`](./docs/diagrams/) for visual architecture diagrams and [`
 
 ## Live URLs
 
-- Backend API: `https://gdgpufwpd3.execute-api.us-east-1.amazonaws.com/api/health`
-- Frontend (via CloudFront): see CloudFront stack outputs after deploy
+- **App (via CloudFront):** https://d2h0na5j6cm5jo.cloudfront.net
+- **API (via CloudFront proxy):** https://d2h0na5j6cm5jo.cloudfront.net/api/health
+- API Gateway direct (debugging only): https://gdgpufwpd3.execute-api.us-east-1.amazonaws.com/api/health
 
 ## Quick start (local dev)
 
