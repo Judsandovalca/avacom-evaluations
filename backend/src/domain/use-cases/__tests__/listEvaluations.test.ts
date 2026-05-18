@@ -10,7 +10,7 @@ describe('listEvaluations', () => {
     ]);
     const r = await listEvaluations({ repo })({ userId: 'u-1' });
     expect(r.items).toHaveLength(1);
-    expect(r.items[0].evaluationId).toBe('1');
+    expect(r.items[0]!.evaluationId).toBe('1');
   });
 
   it('filters by status', async () => {
