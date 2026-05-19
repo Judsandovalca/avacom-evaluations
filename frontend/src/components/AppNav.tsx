@@ -18,7 +18,7 @@ export function AppNav() {
     try {
       await api.post('/auth/logout');
       setUser(null);
-      navigate('/login');
+      navigate('/');
     } catch {
       show('Could not log out', 'error');
     }

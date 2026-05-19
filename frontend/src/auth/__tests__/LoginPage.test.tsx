@@ -51,4 +51,11 @@ describe('LoginPage', () => {
     await userEvent.click(screen.getByRole('button', { name: /log in/i }));
     await waitFor(() => expect(screen.getByText(/invalid/i)).toBeInTheDocument());
   });
+
+  it('has an Explore as guest link pointing to /', async () => {
+    renderWithProviders(<App />, { initialEntries: ['/login'] });
+    await waitFor(() => screen.getByLabelText(/email/i));
+    const guestLink = screen.getByRole('link', { name: /explore as guest/i });
+    expect(guestLink).toHaveAttribute('href', '/');
+  });
 });

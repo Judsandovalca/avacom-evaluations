@@ -35,6 +35,18 @@ export function LoginPage() {
         <Input label="Email" id="email" type="email" {...register('email')} error={errors.email?.message} />
         <Input label="Password" id="password" type="password" {...register('password')} error={errors.password?.message} />
         <Button type="submit" loading={isSubmitting} className="w-full">Log in</Button>
+
+        <div className="relative py-1">
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div className="w-full border-t border-slate-200" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-white px-2 text-xs uppercase tracking-wider text-slate-400">or</span>
+          </div>
+        </div>
+
+        <Link to="/" className="btn-ghost w-full">Explore as guest</Link>
+
         <p className="text-sm text-slate-600 text-center">
           No account? <Link to="/signup" className="text-brand-600 hover:underline">Sign up</Link>
         </p>
