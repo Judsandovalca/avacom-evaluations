@@ -1,5 +1,7 @@
 // src/evaluations/EvaluationsTable.tsx
 import { Link } from 'react-router-dom';
+import type { ColumnDef } from '@tanstack/react-table';
+import { DataTable } from '../components/DataTable';
 import { useCourses } from '../courses/hooks/useCourses';
 import type { Evaluation } from './types';
 
@@ -18,36 +20,57 @@ export function EvaluationsTable({ items, onDelete }: Props) {
   const { data: courses } = useCourses();
   const courseNameById = new Map((courses ?? []).map((c) => [c.courseId, c.name]));
 
-  if (items.length === 0) {
-    return <p className="text-slate-500 italic">No evaluations yet. Create your first one.</p>;
-  }
+  const columns: ColumnDef<Evaluation>[] = [
+    {
+      accessorKey: 'title',
+      header: 'Title',
+      cell: ({ row }) => <span className="font-medium text-slate-900">{row.original.title}</span>,
+    },
+    {
+      accessorKey: 'courseId',
+      header: 'Course',
+      cell: ({ row }) => courseNameById.get(row.original.courseId) ?? row.original.courseId,
+    },
+    {
+      accessorKey: 'dueDate',
+      header: 'Due',
+      cell: ({ row }) => new Date(row.original.dueDate).toLocaleString(),
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
+        <span className={`inline-block rounded-full px-2 py-0.5 text-xs ${statusBadge[row.original.status]}`}>
+          {row.original.status}
+        </span>
+      ),
+    },
+    {
+      id: 'actions',
+      header: () => <span className="block text-right">Actions</span>,
+      cell: ({ row }) => (
+        <div className="text-right space-x-3">
+          <Link to={`/evaluations/${row.original.evaluationId}/edit`} className="text-brand-600 hover:underline text-sm">
+            Edit
+          </Link>
+          <button
+            type="button"
+            onClick={() => onDelete(row.original.evaluationId)}
+            className="text-red-600 hover:underline text-sm"
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <table className="w-full text-sm border-collapse">
-      <thead>
-        <tr className="text-left text-slate-600 border-b border-slate-200">
-          <th className="py-2 pr-4">Title</th>
-          <th className="py-2 pr-4">Course</th>
-          <th className="py-2 pr-4">Due</th>
-          <th className="py-2 pr-4">Status</th>
-          <th className="py-2 pr-4 text-right">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {items.map((e) => (
-          <tr key={e.evaluationId} className="border-b border-slate-100 hover:bg-slate-50">
-            <td className="py-2 pr-4 font-medium text-slate-900">{e.title}</td>
-            <td className="py-2 pr-4">{courseNameById.get(e.courseId) ?? e.courseId}</td>
-            <td className="py-2 pr-4">{new Date(e.dueDate).toLocaleString()}</td>
-            <td className="py-2 pr-4">
-              <span className={`inline-block rounded-full px-2 py-0.5 text-xs ${statusBadge[e.status]}`}>{e.status}</span>
-            </td>
-            <td className="py-2 pr-4 text-right space-x-2">
-              <Link to={`/evaluations/${e.evaluationId}/edit`} className="text-brand-600 hover:underline text-sm">Edit</Link>
-              <button onClick={() => onDelete(e.evaluationId)} className="text-red-600 hover:underline text-sm">Delete</button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <DataTable
+      columns={columns}
+      data={items}
+      pageSize={10}
+      emptyMessage="No evaluations yet. Create your first one."
+    />
   );
 }

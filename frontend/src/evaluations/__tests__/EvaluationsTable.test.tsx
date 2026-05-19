@@ -24,7 +24,9 @@ describe('EvaluationsTable', () => {
   it('calls onDelete', async () => {
     const onDelete = vi.fn();
     renderWithProviders(<EvaluationsTable items={items} onDelete={onDelete} />);
-    await userEvent.click(screen.getByText('Delete'));
+    await waitFor(() => expect(screen.getByText('Algorithms')).toBeInTheDocument());
+    const deleteBtn = screen.getByRole('button', { name: /delete/i });
+    await userEvent.click(deleteBtn);
     expect(onDelete).toHaveBeenCalledWith('1');
   });
 });
