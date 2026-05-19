@@ -68,9 +68,21 @@ export const handlers = [
       return HttpResponse.json({ error: { code: 'CONFLICT', message: 'exists' } }, { status: 409 });
     }
     return HttpResponse.json({
-      course: { courseId: 'new-course-id', name: body.name, createdAt: '2026-05-17T10:00:00.000Z' },
+      course: { courseId: 'new-course-id', name: body.name, createdAt: '2026-05-17T10:00:00.000Z', deletedAt: null },
     }, { status: 201 });
   }),
+
+  http.put(`${API}/courses/:id`, async ({ request, params }) => {
+    const body = await request.json() as { name: string };
+    if (body.name === 'Algorithms') {
+      return HttpResponse.json({ error: { code: 'CONFLICT', message: 'exists' } }, { status: 409 });
+    }
+    return HttpResponse.json({
+      course: { courseId: params.id, name: body.name, createdAt: '2026-05-17T10:00:00.000Z', deletedAt: null },
+    });
+  }),
+
+  http.delete(`${API}/courses/:id`, () => new HttpResponse(null, { status: 204 })),
 
   http.get(`${API}/health`, () => HttpResponse.json({ status: 'ok', version: 'test', uptime: 1 })),
 ];
