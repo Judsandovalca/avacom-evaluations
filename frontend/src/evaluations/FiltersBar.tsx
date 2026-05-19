@@ -1,6 +1,6 @@
 // src/evaluations/FiltersBar.tsx
 import { Select } from '../components/Select';
-import { Input } from '../components/Input';
+import { useCourses } from '../courses/hooks/useCourses';
 import type { EvaluationStatus } from './types';
 
 interface Props {
@@ -17,6 +17,12 @@ const statusOptions = [
 ];
 
 export function FiltersBar({ status, courseId, onChange }: Props) {
+  const { data: courses, isLoading } = useCourses();
+  const courseOptions = [
+    { value: '', label: 'All courses' },
+    ...(courses ?? []).map((c) => ({ value: c.courseId, label: c.name })),
+  ];
+
   return (
     <div className="flex flex-wrap gap-3 items-end">
       <div className="w-48">
@@ -29,10 +35,12 @@ export function FiltersBar({ status, courseId, onChange }: Props) {
         />
       </div>
       <div className="w-48">
-        <Input
-          label="Course ID"
+        <Select
+          label="Course"
           id="filter-course"
+          options={courseOptions}
           value={courseId ?? ''}
+          disabled={isLoading}
           onChange={(e) => onChange({ status, courseId: e.target.value || undefined })}
         />
       </div>
