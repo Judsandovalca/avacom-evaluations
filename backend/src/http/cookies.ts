@@ -10,14 +10,16 @@ const ACCESS_MAX_AGE = 900; // 15 minutes
 const REFRESH_MAX_AGE = 604800; // 7 days
 
 function buildCookie(name: string, value: string, path: string, maxAge: number): string {
-  return [
+  const secure = process.env.COOKIE_SECURE !== 'false';
+  const parts = [
     `${name}=${value}`,
     'HttpOnly',
-    'Secure',
-    'SameSite=Strict',
+    'SameSite=Lax',
     `Path=${path}`,
     `Max-Age=${maxAge}`,
-  ].join('; ');
+  ];
+  if (secure) parts.splice(2, 0, 'Secure');
+  return parts.join('; ');
 }
 
 export function buildSetAccessCookie(token: string): string {

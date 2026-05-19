@@ -1,5 +1,5 @@
 // src/http/__tests__/cookies.test.ts
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach } from 'vitest';
 import {
   buildSetAccessCookie,
   buildSetRefreshCookie,
@@ -8,15 +8,29 @@ import {
 } from '../cookies';
 
 describe('cookies', () => {
+  const originalSecure = process.env.COOKIE_SECURE;
+  beforeEach(() => { delete process.env.COOKIE_SECURE; });
+  afterEach(() => {
+    if (originalSecure === undefined) delete process.env.COOKIE_SECURE;
+    else process.env.COOKIE_SECURE = originalSecure;
+  });
+
   describe('buildSetAccessCookie', () => {
-    it('builds an access cookie with HttpOnly, Secure, SameSite=Strict, Path=/, Max-Age=900', () => {
+    it('builds an access cookie with HttpOnly, Secure (by default), SameSite=Lax, Path=/, Max-Age=900', () => {
       const cookie = buildSetAccessCookie('token-value');
       expect(cookie).toContain('access_token=token-value');
       expect(cookie).toContain('HttpOnly');
       expect(cookie).toContain('Secure');
-      expect(cookie).toContain('SameSite=Strict');
+      expect(cookie).toContain('SameSite=Lax');
       expect(cookie).toContain('Path=/');
       expect(cookie).toContain('Max-Age=900');
+    });
+
+    it('omits Secure when COOKIE_SECURE=false (local dev over HTTP)', () => {
+      process.env.COOKIE_SECURE = 'false';
+      const cookie = buildSetAccessCookie('t');
+      expect(cookie).not.toContain('Secure');
+      expect(cookie).toContain('SameSite=Lax');
     });
   });
 
@@ -26,7 +40,7 @@ describe('cookies', () => {
       expect(cookie).toContain('refresh_token=refresh-value');
       expect(cookie).toContain('HttpOnly');
       expect(cookie).toContain('Secure');
-      expect(cookie).toContain('SameSite=Strict');
+      expect(cookie).toContain('SameSite=Lax');
       expect(cookie).toContain('Path=/api/auth');
       expect(cookie).toContain('Max-Age=604800');
     });

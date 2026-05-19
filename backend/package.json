@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "node esbuild.config.mjs",
+    "build:watch": "node esbuild.config.mjs --watch",
     "dev": "sam local start-api --env-vars env.local.json",
+    "ddb:init": "node scripts/init-local-tables.mjs",
     "deploy": "npm run build && sam deploy",
     "deploy:guided": "npm run build && sam deploy --guided",
     "test": "vitest run --project unit",
