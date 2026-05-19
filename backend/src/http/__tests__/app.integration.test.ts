@@ -63,14 +63,14 @@ describe('app (integration)', () => {
       }),
     });
     expect(create.status).toBe(201);
-    const { evaluation } = await create.json() as any;
+    const { evaluation } = await create.json() as { evaluation: { evaluationId: string; userId: string } };
     expect(evaluation.userId).toBeTruthy();
     const evalId = evaluation.evaluationId;
 
     // 3. List
     const list = await app.request('/api/evaluations', { headers: { Cookie } });
     expect(list.status).toBe(200);
-    const listBody = await list.json() as any;
+    const listBody = await list.json() as { items: unknown[] };
     expect(listBody.items).toHaveLength(1);
 
     // 4. Get
@@ -84,7 +84,8 @@ describe('app (integration)', () => {
       body: JSON.stringify({ title: 'New title' }),
     });
     expect(upd.status).toBe(200);
-    expect((await upd.json() as any).evaluation.title).toBe('New title');
+    const updBody = await upd.json() as { evaluation: { title: string } };
+    expect(updBody.evaluation.title).toBe('New title');
 
     // 6. Delete (soft)
     const del = await app.request(`/api/evaluations/${evalId}`, {
@@ -94,7 +95,8 @@ describe('app (integration)', () => {
 
     // 7. List empty
     const list2 = await app.request('/api/evaluations', { headers: { Cookie } });
-    expect((await list2.json() as any).items).toHaveLength(0);
+    const list2Body = await list2.json() as { items: unknown[] };
+    expect(list2Body.items).toHaveLength(0);
   });
 
   it('rejects request without auth cookie', async () => {
@@ -122,7 +124,8 @@ describe('app (integration)', () => {
     });
     const cB = cookieHeader(sB.headers.getSetCookie());
     const list = await app.request('/api/evaluations', { headers: { Cookie: cB } });
-    expect((await list.json() as any).items).toHaveLength(0);
+    const listBody = await list.json() as { items: unknown[] };
+    expect(listBody.items).toHaveLength(0);
   });
 
   it('signup with duplicate email returns 409', async () => {
@@ -149,7 +152,8 @@ describe('app (integration)', () => {
   it('GET /api/health responds 200', async () => {
     const r = await buildTestApp().request('/api/health');
     expect(r.status).toBe(200);
-    expect((await r.json() as any).status).toBe('ok');
+    const body = await r.json() as { status: string };
+    expect(body.status).toBe('ok');
   });
 
   it('logout clears cookies', async () => {
@@ -185,7 +189,8 @@ describe('app (integration)', () => {
       method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: cA },
       body: JSON.stringify({ courseId: 'c', title: 't', description: 'd', dueDate: '2026-06-01T12:00:00.000Z', status: 'active' }),
     });
-    const evalId = (await create.json() as any).evaluation.evaluationId;
+    const createBody = await create.json() as { evaluation: { evaluationId: string } };
+    const evalId = createBody.evaluation.evaluationId;
 
     const sB = await app.request('/api/auth/signup', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -207,7 +212,8 @@ describe('app (integration)', () => {
       body: JSON.stringify({ email: 'not-email', password: 'short', name: '' }),
     });
     expect(r.status).toBe(400);
-    expect((await r.json() as any).error.code).toBe('VALIDATION_ERROR');
+    const body = await r.json() as { error: { code: string } };
+    expect(body.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('GET /api/courses is public (no auth cookie required)', async () => {

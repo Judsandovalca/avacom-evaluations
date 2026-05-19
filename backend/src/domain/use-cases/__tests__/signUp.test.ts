@@ -22,7 +22,7 @@ describe('signUp', () => {
 
   it('hashes password, persists user, and returns tokens + public user', async () => {
     const userRepo = makeRepo();
-    (userRepo.findByEmail as any).mockResolvedValue(null);
+    vi.mocked(userRepo.findByEmail).mockResolvedValue(null);
     const tokens = makeTokens();
 
     const result = await signUp({ userRepo, tokens, hasher })({
@@ -31,16 +31,19 @@ describe('signUp', () => {
 
     expect(hasher.hash).toHaveBeenCalledWith('password123', 10);
     expect(userRepo.save).toHaveBeenCalledOnce();
-    const saved = (userRepo.save as any).mock.calls[0][0];
-    expect(saved.email).toBe('new@avacom.com');
-    expect(saved.passwordHash).toBe('hashed$xxx');
+    const saved = vi.mocked(userRepo.save).mock.calls[0]?.[0];
+    expect(saved?.email).toBe('new@avacom.com');
+    expect(saved?.passwordHash).toBe('hashed$xxx');
     expect(result.tokens).toEqual({ accessToken: 'AT', refreshToken: 'RT' });
-    expect(result.user).toEqual({ userId: saved.userId, email: 'new@avacom.com', name: 'New' });
+    expect(result.user).toEqual({ userId: saved?.userId, email: 'new@avacom.com', name: 'New' });
   });
 
   it('rejects when email already exists', async () => {
     const userRepo = makeRepo();
-    (userRepo.findByEmail as any).mockResolvedValue({ email: 'x@y.com' });
+    vi.mocked(userRepo.findByEmail).mockResolvedValue({
+      userId: 'u-existing', email: 'x@y.com', passwordHash: 'hashed', name: 'X',
+      createdAt: '2026-05-17T10:00:00.000Z',
+    });
 
     await expect(
       signUp({ userRepo, tokens: makeTokens(), hasher })({
@@ -51,7 +54,7 @@ describe('signUp', () => {
 
   it('rejects password shorter than 8 chars', async () => {
     const userRepo = makeRepo();
-    (userRepo.findByEmail as any).mockResolvedValue(null);
+    vi.mocked(userRepo.findByEmail).mockResolvedValue(null);
 
     await expect(
       signUp({ userRepo, tokens: makeTokens(), hasher })({
@@ -62,7 +65,7 @@ describe('signUp', () => {
 
   it('normalizes email before lookup', async () => {
     const userRepo = makeRepo();
-    (userRepo.findByEmail as any).mockResolvedValue(null);
+    vi.mocked(userRepo.findByEmail).mockResolvedValue(null);
 
     await signUp({ userRepo, tokens: makeTokens(), hasher })({
       email: '  USER@DOMAIN.COM  ', password: 'password123', name: 'X',
@@ -73,15 +76,15 @@ describe('signUp', () => {
 
   it('returns userId and email in token payload', async () => {
     const userRepo = makeRepo();
-    (userRepo.findByEmail as any).mockResolvedValue(null);
+    vi.mocked(userRepo.findByEmail).mockResolvedValue(null);
     const tokens = makeTokens();
 
     await signUp({ userRepo, tokens, hasher })({
       email: 'a@b.com', password: 'password123', name: 'A',
     });
 
-    const call = (tokens.signPair as any).mock.calls[0][0];
-    expect(call.email).toBe('a@b.com');
-    expect(call.userId).toMatch(/^[0-9a-f-]{36}$/);
+    const call = vi.mocked(tokens.signPair).mock.calls[0]?.[0];
+    expect(call?.email).toBe('a@b.com');
+    expect(call?.userId).toMatch(/^[0-9a-f-]{36}$/);
   });
 });

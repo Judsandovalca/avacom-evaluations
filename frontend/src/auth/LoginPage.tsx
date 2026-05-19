@@ -6,7 +6,7 @@ import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { api } from '../lib/api';
 import { useAuth } from './useAuth';
-import { useToast } from '../components/ToastProvider';
+import { useToast } from '../components/ToastContext';
 
 export function LoginPage() {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginInput>({

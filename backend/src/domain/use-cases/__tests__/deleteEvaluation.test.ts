@@ -13,8 +13,8 @@ describe('deleteEvaluation', () => {
     const e = fixture({ evaluationId: '1', userId: 'u-1' });
     const repo = makeEvaluationRepo([e]);
     await deleteEvaluation({ repo })({ evaluationId: '1', userId: 'u-1' });
-    const persisted = (repo.update as any).mock.calls[0][0];
-    expect(persisted.deletedAt).toBe('2026-05-17T11:00:00.000Z');
+    const persisted = vi.mocked(repo.update).mock.calls[0]?.[0];
+    expect(persisted?.deletedAt).toBe('2026-05-17T11:00:00.000Z');
   });
 
   it('throws NotFoundError when not found', async () => {

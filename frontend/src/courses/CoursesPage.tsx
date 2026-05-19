@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { AxiosError } from 'axios';
 import { useCourses } from './hooks/useCourses';
 import { useCreateCourse } from './hooks/useCreateCourse';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { LoadingSpinner } from '../components/LoadingSpinner';
-import { useToast } from '../components/ToastProvider';
+import { useToast } from '../components/ToastContext';
 
 export function CoursesPage() {
   const { data: courses, isLoading, isError, refetch } = useCourses();
@@ -20,8 +21,9 @@ export function CoursesPage() {
       await createMut.mutateAsync({ name: name.trim() });
       show(`Course "${name.trim()}" created`, 'success');
       setName('');
-    } catch (err: any) {
-      const msg = err?.response?.status === 409
+    } catch (err: unknown) {
+      const status = err instanceof AxiosError ? err.response?.status : undefined;
+      const msg = status === 409
         ? 'A course with that name already exists'
         : 'Could not create course';
       show(msg, 'error');
