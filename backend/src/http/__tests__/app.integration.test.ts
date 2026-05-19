@@ -209,4 +209,22 @@ describe('app (integration)', () => {
     expect(r.status).toBe(400);
     expect((await r.json() as any).error.code).toBe('VALIDATION_ERROR');
   });
+
+  it('GET /api/courses is public (no auth cookie required)', async () => {
+    const app = buildTestApp();
+    const r = await app.request('/api/courses');
+    expect(r.status).toBe(200);
+    const body = await r.json() as { items: unknown[] };
+    expect(Array.isArray(body.items)).toBe(true);
+  });
+
+  it('POST /api/courses still requires auth', async () => {
+    const app = buildTestApp();
+    const r = await app.request('/api/courses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Unauthorized Course' }),
+    });
+    expect(r.status).toBe(401);
+  });
 });
