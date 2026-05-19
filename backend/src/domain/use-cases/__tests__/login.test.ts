@@ -33,24 +33,24 @@ describe('login', () => {
 
   it('throws UnauthorizedError when user not found (no enumeration)', async () => {
     const d = deps();
-    (d.userRepo.findByEmail as any).mockResolvedValue(null);
+    vi.mocked(d.userRepo.findByEmail).mockResolvedValue(null);
     await expect(login(d)({ email: 'x@y.com', password: 'password123' }))
       .rejects.toThrow(UnauthorizedError);
   });
 
   it('throws UnauthorizedError when password mismatches', async () => {
     const d = deps();
-    (d.verifier.compare as any).mockResolvedValue(false);
+    vi.mocked(d.verifier.compare).mockResolvedValue(false);
     await expect(login(d)({ email: 'a@b.com', password: 'wrong' }))
       .rejects.toThrow(UnauthorizedError);
   });
 
   it('uses the same error message for "not found" and "bad password"', async () => {
     const d = deps();
-    (d.userRepo.findByEmail as any).mockResolvedValue(null);
+    vi.mocked(d.userRepo.findByEmail).mockResolvedValue(null);
     const e1 = await login(d)({ email: 'x@y.com', password: 'password123' }).catch(e => e);
-    (d.userRepo.findByEmail as any).mockResolvedValue(validUser);
-    (d.verifier.compare as any).mockResolvedValue(false);
+    vi.mocked(d.userRepo.findByEmail).mockResolvedValue(validUser);
+    vi.mocked(d.verifier.compare).mockResolvedValue(false);
     const e2 = await login(d)({ email: 'a@b.com', password: 'wrong' }).catch(e => e);
     expect(e1.message).toBe(e2.message);
   });

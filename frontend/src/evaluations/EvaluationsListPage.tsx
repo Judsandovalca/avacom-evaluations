@@ -8,7 +8,7 @@ import { useDeleteEvaluation } from './hooks/useDeleteEvaluation';
 import { FiltersBar } from './FiltersBar';
 import { EvaluationsTable } from './EvaluationsTable';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
-import { useToast } from '../components/ToastProvider';
+import { useToast } from '../components/ToastContext';
 import type { EvaluationStatus } from './types';
 
 export function EvaluationsListPage() {

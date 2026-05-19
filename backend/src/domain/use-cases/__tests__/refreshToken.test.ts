@@ -26,7 +26,7 @@ describe('refreshToken', () => {
 
   it('throws UnauthorizedError when refresh verification fails', async () => {
     const d = deps();
-    (d.tokens.verifyRefresh as any).mockRejectedValue(new Error('expired'));
+    vi.mocked(d.tokens.verifyRefresh).mockRejectedValue(new Error('expired'));
     await expect(refreshToken(d)({ refreshToken: 'bad' }))
       .rejects.toThrow(UnauthorizedError);
   });

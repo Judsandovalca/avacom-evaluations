@@ -1,20 +1,6 @@
-import { createContext, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../lib/api';
-
-export interface User {
-  userId: string;
-  email: string;
-  name: string;
-}
-
-export interface AuthContextValue {
-  user: User | null;
-  isLoading: boolean;
-  setUser: (user: User | null) => void;
-  refresh: () => Promise<void>;
-}
-
-export const AuthContext = createContext<AuthContextValue | null>(null);
+import { AuthContext, type User } from './AuthContext';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -32,6 +18,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Fetch-on-mount syncs user state with the /auth/me endpoint.
+    // The rule flags any setState triggered from an effect; here the
+    // setState lives inside refresh() and is the intended sync.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [refresh]);
 

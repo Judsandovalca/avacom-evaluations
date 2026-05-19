@@ -41,7 +41,7 @@ describe('api with refresh interceptor', () => {
 
   it('shares a single refresh call across concurrent 401s', async () => {
     let refreshCalls = 0;
-    let firstAttempts = { a: 0, b: 0 };
+    const firstAttempts = { a: 0, b: 0 };
     server.use(
       http.get('/api/a', () => {
         firstAttempts.a += 1;
