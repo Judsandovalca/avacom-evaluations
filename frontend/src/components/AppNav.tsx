@@ -45,12 +45,10 @@ export function AppNav() {
           })}
           {user && (
             <>
-              <span className="text-sm text-slate-500" aria-label="Signed in as">{user.email}</span>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="text-sm text-red-600 hover:underline"
-              >
+              <span className="text-sm text-slate-500 pl-2 border-l border-slate-200" aria-label="Signed in as">
+                {user.email}
+              </span>
+              <button type="button" onClick={handleLogout} className="btn-danger-ghost">
                 Logout
               </button>
             </>

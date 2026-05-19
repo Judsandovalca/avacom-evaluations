@@ -12,9 +12,9 @@ export function TopNav({ cta }: Props) {
         <Link to="/" className="text-lg font-semibold text-slate-900">
           AVACOM Evaluations
         </Link>
-        <div className="flex items-center gap-3">
-          <Link to="/login" className="text-brand-600 hover:underline text-sm">Log in</Link>
-          <Link to="/signup" className="text-brand-600 hover:underline text-sm">Sign up</Link>
+        <div className="flex items-center gap-2">
+          <Link to="/login" className="btn-ghost">Log in</Link>
+          <Link to="/signup" className="btn-secondary">Sign up</Link>
           {cta}
         </div>
       </div>

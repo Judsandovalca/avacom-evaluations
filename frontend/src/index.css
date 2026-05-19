@@ -14,13 +14,27 @@
   }
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-md bg-brand-600 px-4 py-2
-           text-sm font-medium text-white shadow-sm hover:bg-brand-700
+           text-sm font-medium text-white shadow-sm transition-colors duration-150
+           hover:bg-brand-700 hover:shadow
            focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2
            disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center rounded-md border border-slate-300 bg-white
-           px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50
+           px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors duration-150
+           hover:bg-slate-50 hover:border-slate-400
            focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2
+           text-sm font-medium text-slate-700 transition-colors duration-150
+           hover:bg-slate-100 hover:text-slate-900
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
+  }
+  .btn-danger-ghost {
+    @apply inline-flex items-center justify-center rounded-md px-3 py-1.5
+           text-sm font-medium text-slate-600 transition-colors duration-150
+           hover:bg-red-50 hover:text-red-700
+           focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
   }
 }

@@ -3,14 +3,21 @@ import { forwardRef } from 'react';
 import type { ButtonHTMLAttributes } from 'react';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger-ghost';
   loading?: boolean;
 }
+
+const variantClass = {
+  primary: 'btn-primary',
+  secondary: 'btn-secondary',
+  ghost: 'btn-ghost',
+  'danger-ghost': 'btn-danger-ghost',
+} as const;
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = 'primary', loading, disabled, children, className, ...rest }, ref,
 ) {
-  const klass = variant === 'secondary' ? 'btn-secondary' : 'btn-primary';
+  const klass = variantClass[variant];
   return (
     <button
       ref={ref}
