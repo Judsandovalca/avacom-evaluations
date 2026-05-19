@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './auth/AuthProvider';
 import { ProtectedRoute } from './auth/ProtectedRoute';
+import { GuestRoute } from './auth/GuestRoute';
 import { LoginPage } from './auth/LoginPage';
 import { SignupPage } from './auth/SignupPage';
 import { EvaluationsListPage } from './evaluations/EvaluationsListPage';
@@ -26,8 +27,10 @@ export default function App() {
             <AuthProvider>
               <Routes>
                 <Route path="/" element={<PublicCoursesPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
+                <Route element={<GuestRoute />}>
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                </Route>
                 <Route element={<ProtectedRoute />}>
                   <Route path="/evaluations" element={<EvaluationsListPage />} />
                   <Route path="/evaluations/new" element={<EvaluationFormPage mode="create" />} />
