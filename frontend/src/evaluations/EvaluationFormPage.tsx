@@ -42,12 +42,18 @@ export function EvaluationFormPage({ mode }: Props) {
   }
 
   async function onSubmit(data: EvaluationFormInput) {
+    // datetime-local gives "YYYY-MM-DDTHH:MM"; backend requires ISO 8601
+    // with timezone. Convert local clock time to UTC ISO before sending.
+    const payload = {
+      ...data,
+      dueDate: new Date(data.dueDate).toISOString(),
+    };
     try {
       if (mode === 'create') {
-        await createMut.mutateAsync(data);
+        await createMut.mutateAsync(payload);
         show('Created', 'success');
       } else {
-        await updateMut.mutateAsync({ id, patch: data });
+        await updateMut.mutateAsync({ id, patch: payload });
         show('Updated', 'success');
       }
       navigate('/evaluations');
