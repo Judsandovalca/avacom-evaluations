@@ -1,5 +1,7 @@
 # AVACOM Evaluation Management System
 
+[![CI/CD](https://github.com/Judsandovalca/avacom-evaluations/actions/workflows/cicd.yml/badge.svg?branch=main)](https://github.com/Judsandovalca/avacom-evaluations/actions/workflows/cicd.yml)
+
 Full-stack serverless CRUD app for managing course evaluations.
 
 ## Architecture
