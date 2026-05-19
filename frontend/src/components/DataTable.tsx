@@ -47,24 +47,30 @@ export function DataTable<T>({ columns, data, pageSize = 10, emptyMessage = 'No 
           <thead>
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} className="text-left text-slate-600 border-b border-slate-200">
-                {hg.headers.map((header) => (
-                  <th key={header.id} className="py-2 px-4 font-medium">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
+                {hg.headers.map((header) => {
+                  const extra = (header.column.columnDef.meta as { className?: string } | undefined)?.className ?? '';
+                  return (
+                    <th key={header.id} className={`py-2 px-4 font-medium ${extra}`}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </th>
+                  );
+                })}
               </tr>
             ))}
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="py-2 px-4">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
+                {row.getVisibleCells().map((cell) => {
+                  const extra = (cell.column.columnDef.meta as { className?: string } | undefined)?.className ?? '';
+                  return (
+                    <td key={cell.id} className={`py-2 px-4 ${extra}`}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

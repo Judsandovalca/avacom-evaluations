@@ -72,8 +72,9 @@ export function CoursesPage() {
       id: 'rowNumber',
       header: () => <span className="block text-right">#</span>,
       cell: ({ row }) => (
-        <span className="font-mono text-slate-400 block text-right w-8">#{row.index + 1}</span>
+        <span className="font-mono text-slate-400 block text-right">#{row.index + 1}</span>
       ),
+      meta: { className: 'w-2' },
     },
     {
       accessorKey: 'name',
