@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AxiosError } from 'axios';
+import type { ColumnDef } from '@tanstack/react-table';
 import { useCourses } from './hooks/useCourses';
 import { useCreateCourse } from './hooks/useCreateCourse';
 import { Input } from '../components/Input';
@@ -9,8 +10,9 @@ import { AppNav } from '../components/AppNav';
 import { PageShell } from '../components/PageShell';
 import { PageHeader } from '../components/PageHeader';
 import { ErrorAlert } from '../components/ErrorAlert';
-import { EmptyState } from '../components/EmptyState';
+import { DataTable } from '../components/DataTable';
 import { useToast } from '../components/ToastContext';
+import type { Course } from './types';
 
 export function CoursesPage() {
   const { data: courses, isLoading, isError, refetch } = useCourses();
@@ -33,6 +35,21 @@ export function CoursesPage() {
       show(msg, 'error');
     }
   }
+
+  const columns = useMemo<ColumnDef<Course>[]>(() => [
+    {
+      id: 'rowNumber',
+      header: () => <span className="block text-right">#</span>,
+      cell: ({ row }) => (
+        <span className="font-mono text-slate-400 block text-right w-8">#{row.index + 1}</span>
+      ),
+    },
+    {
+      accessorKey: 'name',
+      header: 'Name',
+      cell: ({ row }) => <span className="font-medium text-slate-900">{row.original.name}</span>,
+    },
+  ], []);
 
   return (
     <>
@@ -58,16 +75,13 @@ export function CoursesPage() {
 
         {isLoading && <LoadingSpinner />}
         {isError && <ErrorAlert message="Could not load courses." onRetry={refetch} />}
-        {courses && courses.length === 0 && <EmptyState message="No courses yet. Add one above." />}
-        {courses && courses.length > 0 && (
-          <ul className="bg-white rounded-lg shadow-sm divide-y divide-slate-100">
-            {courses.map((c, i) => (
-              <li key={c.courseId} className="p-4 flex items-center gap-4">
-                <span className="font-mono text-slate-400 w-8 text-right">#{i + 1}</span>
-                <span className="font-medium text-slate-900">{c.name}</span>
-              </li>
-            ))}
-          </ul>
+        {courses && (
+          <DataTable
+            columns={columns}
+            data={courses}
+            pageSize={10}
+            emptyMessage="No courses yet. Add one above."
+          />
         )}
       </PageShell>
     </>
