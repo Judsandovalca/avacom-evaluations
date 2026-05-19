@@ -33,4 +33,22 @@ describe('CoursesPage', () => {
     renderWithProviders(<App />, { initialEntries: ['/courses'] });
     await waitFor(() => expect(screen.getByText(/no courses yet/i)).toBeInTheDocument());
   });
+
+  it('opens the edit dialog when Edit is clicked', async () => {
+    const userEvent = (await import('@testing-library/user-event')).default;
+    renderWithProviders(<App />, { initialEntries: ['/courses'] });
+    await waitFor(() => screen.getByText('Algorithms'));
+    const editButtons = screen.getAllByRole('button', { name: 'Edit' });
+    await userEvent.click(editButtons[0]);
+    expect(await screen.findByRole('dialog', { name: /edit course/i })).toBeInTheDocument();
+  });
+
+  it('opens the delete dialog when Delete is clicked', async () => {
+    const userEvent = (await import('@testing-library/user-event')).default;
+    renderWithProviders(<App />, { initialEntries: ['/courses'] });
+    await waitFor(() => screen.getByText('Algorithms'));
+    const deleteButtons = screen.getAllByRole('button', { name: 'Delete' });
+    await userEvent.click(deleteButtons[0]);
+    expect(await screen.findByRole('dialog', { name: /delete course/i })).toBeInTheDocument();
+  });
 });

@@ -15,6 +15,10 @@ export class DynamoCourseRepository implements CourseRepository {
     await this.doc.send(new PutCommand({ TableName: this.tableName, Item: c }));
   }
 
+  async update(c: Course): Promise<void> {
+    await this.doc.send(new PutCommand({ TableName: this.tableName, Item: c }));
+  }
+
   async findById(id: string): Promise<Course | null> {
     const r = await this.doc.send(new GetCommand({
       TableName: this.tableName, Key: { courseId: id },
@@ -23,7 +27,11 @@ export class DynamoCourseRepository implements CourseRepository {
   }
 
   async list(): Promise<Course[]> {
-    const r = await this.doc.send(new ScanCommand({ TableName: this.tableName }));
+    const r = await this.doc.send(new ScanCommand({
+      TableName: this.tableName,
+      FilterExpression: 'attribute_not_exists(deletedAt) OR deletedAt = :null',
+      ExpressionAttributeValues: { ':null': null },
+    }));
     return (r.Items as Course[] | undefined) ?? [];
   }
 }

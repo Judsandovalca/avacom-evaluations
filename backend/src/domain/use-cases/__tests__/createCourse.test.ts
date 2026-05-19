@@ -9,7 +9,8 @@ function makeRepo(initial: Course[] = []): CourseRepository {
   return {
     save: vi.fn(async (c: Course) => { store.set(c.courseId, c); }),
     findById: vi.fn(async (id) => store.get(id) ?? null),
-    list: vi.fn(async () => [...store.values()]),
+    list: vi.fn(async () => [...store.values()].filter((c) => !c.deletedAt)),
+    update: vi.fn(async (c: Course) => { store.set(c.courseId, c); }),
   };
 }
 
@@ -36,7 +37,7 @@ describe('createCourse', () => {
   });
 
   it('throws ConflictError on case-insensitive duplicate name', async () => {
-    const repo = makeRepo([{ courseId: '1', name: 'Algorithms', createdAt: '2026' }]);
+    const repo = makeRepo([{ courseId: '1', name: 'Algorithms', createdAt: '2026', deletedAt: null }]);
     await expect(createCourse({ repo })({ name: 'ALGORITHMS' })).rejects.toThrow(ConflictError);
   });
 });

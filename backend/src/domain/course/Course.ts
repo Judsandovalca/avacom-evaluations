@@ -4,6 +4,7 @@ export interface Course {
   courseId: string;
   name: string;
   createdAt: string;
+  deletedAt: string | null;
 }
 
 export interface CreateCourseProps {
@@ -16,6 +17,7 @@ export const Course = {
       courseId: randomUUID(),
       name: props.name.trim(),
       createdAt: new Date().toISOString(),
+      deletedAt: null,
     };
   },
 };

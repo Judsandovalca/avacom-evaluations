@@ -9,7 +9,8 @@ function makeRepo(initial: Course[] = []): CourseRepository {
   return {
     save: vi.fn(async (c: Course) => { store.set(c.courseId, c); }),
     findById: vi.fn(async (id) => store.get(id) ?? null),
-    list: vi.fn(async () => [...store.values()]),
+    list: vi.fn(async () => [...store.values()].filter((c) => !c.deletedAt)),
+    update: vi.fn(async (c: Course) => { store.set(c.courseId, c); }),
   };
 }
 
@@ -18,8 +19,8 @@ describe('listCourses', () => {
 
   it('returns existing courses sorted by name', async () => {
     const repo = makeRepo([
-      { courseId: '1', name: 'Z course', createdAt: '2026' },
-      { courseId: '2', name: 'A course', createdAt: '2026' },
+      { courseId: '1', name: 'Z course', createdAt: '2026', deletedAt: null },
+      { courseId: '2', name: 'A course', createdAt: '2026', deletedAt: null },
     ]);
     const result = await listCourses({ repo })();
     expect(result.map((c) => c.name)).toEqual(['A course', 'Z course']);
@@ -36,7 +37,7 @@ describe('listCourses', () => {
   });
 
   it('does NOT seed if at least one course already exists', async () => {
-    const repo = makeRepo([{ courseId: '1', name: 'Only one', createdAt: '2026' }]);
+    const repo = makeRepo([{ courseId: '1', name: 'Only one', createdAt: '2026', deletedAt: null }]);
     const result = await listCourses({ repo })();
     expect(result).toHaveLength(1);
     expect(repo.save).not.toHaveBeenCalled();

@@ -46,3 +46,8 @@ export const createCourseSchema = z.object({
   name: z.string().min(1).max(100).trim(),
 });
 export type CreateCourseBody = z.infer<typeof createCourseSchema>;
+
+export const updateCourseSchema = z.object({
+  name: z.string().min(1).max(100).trim(),
+});
+export type UpdateCourseBody = z.infer<typeof updateCourseSchema>;
