@@ -65,10 +65,10 @@ export function CoursesPage() {
       )}
       {courses && courses.length > 0 && (
         <ul className="bg-white rounded-lg shadow-sm divide-y divide-slate-100">
-          {courses.map((c) => (
-            <li key={c.courseId} className="p-4 flex justify-between items-center">
+          {courses.map((c, i) => (
+            <li key={c.courseId} className="p-4 flex items-center gap-4">
+              <span className="font-mono text-slate-400 w-8 text-right">#{i + 1}</span>
               <span className="font-medium text-slate-900">{c.name}</span>
-              <span className="text-xs text-slate-400 font-mono">{c.courseId.slice(0, 8)}…</span>
             </li>
           ))}
         </ul>
