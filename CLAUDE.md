@@ -39,6 +39,41 @@ Run from the relevant package directory.
 | Tests | `npm test` (Vitest + jsdom + MSW; same 90% coverage gate) |
 | Lint | `npm run lint` |
 
+### Local dev quick start
+
+Run all of these from the repo root, in separate terminals:
+
+```bash
+# 1. DDB Local (Docker)
+cd backend && npm run ddb:up
+
+# 2. Create the three local tables (idempotent — safe to re-run)
+cd backend && npm run ddb:init
+
+# 3. esbuild watch (rebuilds dist/ on every src change)
+cd backend && npm run build:watch
+
+# 4. SAM Local API on :3000 (reads dist/, env.local.json)
+cd backend && npm run dev
+
+# 5. Vite on :5173 (proxies /api → :3000)
+cd frontend && npm run dev
+```
+
+Then open `http://localhost:5173`. Frontend HMR is automatic; backend changes take effect on the next request (SAM Local cold-starts the Lambda per request).
+
+**Cross-platform notes**:
+
+- **Windows + Intel Mac (x86_64)**: works out of the box. The `dev` script already passes `--parameter-overrides LambdaArchitecture=x86_64` because Docker Desktop on x86 hosts can't emulate arm64 Lambda images reliably.
+- **Apple Silicon Mac (M1/M2/M3, arm64)**: also works — the x86_64 Lambda image runs under Rosetta 2, ~200ms slower per cold start but functionally identical. For native arm64 speed, override the dev script: `sam local start-api --env-vars env.local.json --parameter-overrides LambdaArchitecture=arm64 --docker-network avacom-net`. Don't change the npm-script default; prod deploy uses the same template and arm64 is the prod default already.
+- Both architectures land on the same `avacom-net` Docker network, so the Lambda container reaches DDB Local at the hostname `avacom-ddb-local`.
+
+**Local-only env vars** (`backend/env.local.json`):
+
+- `DDB_ENDPOINT=http://avacom-ddb-local:8000` — routes the AWS SDK to the local container. Empty in prod, so the SDK uses the real DDB endpoint.
+- `COOKIE_SECURE=false` — drops the `Secure` flag from auth cookies so they persist on `http://localhost`. Prod default is `true`.
+- Both variables are declared in `template.yaml` under `Globals.Function.Environment.Variables`; SAM Local only honors env overrides for variables already declared in the template.
+
 ### Full deploy from repo root
 
 ```bash
@@ -71,7 +106,7 @@ src/
 - `UsersTable` — PK `email`.
 - `CoursesTable` — PK `courseId`.
 
-**Lambda**: `nodejs22.x`, arm64, 512MB, Tracing Active. Bundled by `esbuild.config.mjs` into `dist/`. HttpApi has a single `ANY /{proxy+}` route — all routing happens inside Hono.
+**Lambda**: `nodejs22.x`, arm64 in prod (x86_64 in local SAM), 512MB, Tracing Active. Architecture is exposed as the `LambdaArchitecture` CloudFormation parameter (default `arm64`). Bundled by `esbuild.config.mjs` into `dist/`. HttpApi has a single `ANY /{proxy+}` route — all routing happens inside Hono.
 
 ## Frontend architecture
 
@@ -89,6 +124,8 @@ src/
 - **Integration tests are serial and need DDB Local** (`fileParallelism: false`, `setup-integration.ts`). Don't run them in CI without the container.
 - **The deployed frontend has no separate API origin** — it talks to `/api/*` which CloudFront proxies. Don't introduce CORS code paths for prod; only the Vite dev proxy needs to bridge `:5173` → `:3000`.
 - **Cookies are httpOnly** — there is no token in JS-accessible storage. Don't add one; the refresh-interceptor pattern is the contract.
+- **Cookie security flags are env-driven.** `buildCookie()` in `backend/src/http/cookies.ts` reads `COOKIE_SECURE` at runtime and uses `SameSite=Lax`. Don't reintroduce `SameSite=Strict` (breaks first-load UX on external links) or hard-code `Secure` (breaks local HTTP). Local dev sets `COOKIE_SECURE=false`; prod keeps the default `true`.
+- **Don't switch the prod Lambda architecture** without checking AWS Lambda pricing — arm64 is ~20% cheaper than x86_64 and the template defaults to it for that reason.
 
 ## When in doubt
 

@@ -7,13 +7,18 @@ Parameters:
     Type: String
     Default: prod
     AllowedValues: [dev, staging, prod]
+  LambdaArchitecture:
+    Type: String
+    Default: arm64
+    AllowedValues: [arm64, x86_64]
+    Description: Use x86_64 for local SAM dev on x86 hosts; arm64 saves cost in prod.
 
 Globals:
   Function:
     Runtime: nodejs22.x
     Timeout: 10
     MemorySize: 512
-    Architectures: [arm64]
+    Architectures: [!Ref LambdaArchitecture]
     Environment:
       Variables:
         NODE_OPTIONS: '--enable-source-maps'
@@ -24,6 +29,8 @@ Globals:
         APP_VERSION: '1.0.0'
         POWERTOOLS_SERVICE_NAME: avacom-api
         POWERTOOLS_LOG_LEVEL: INFO
+        DDB_ENDPOINT: ''
+        COOKIE_SECURE: 'true'
 
 Resources:
   JwtSecret:

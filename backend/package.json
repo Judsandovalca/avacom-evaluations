@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node esbuild.config.mjs",
     "build:watch": "node esbuild.config.mjs --watch",
-    "dev": "sam local start-api --env-vars env.local.json",
+    "dev": "sam local start-api --env-vars env.local.json --parameter-overrides LambdaArchitecture=x86_64 --docker-network avacom-net",
     "ddb:init": "node scripts/init-local-tables.mjs",
     "deploy": "npm run build && sam deploy",
     "deploy:guided": "npm run build && sam deploy --guided",
