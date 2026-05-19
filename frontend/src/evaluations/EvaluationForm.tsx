@@ -29,6 +29,19 @@ export function EvaluationForm({ initialValues, submitting, onSubmit }: Props) {
   const { data: courses, isLoading: coursesLoading } = useCourses();
   const courseOptions = (courses ?? []).map((c) => ({ value: c.courseId, label: c.name }));
 
+  if (!coursesLoading && courseOptions.length === 0) {
+    return (
+      <div className="max-w-2xl bg-amber-50 border border-amber-200 rounded-lg p-5 space-y-3">
+        <h2 className="text-base font-semibold text-amber-900">No courses available</h2>
+        <p className="text-sm text-amber-800">
+          You need at least one course before creating an evaluation. Add one first
+          and come back here.
+        </p>
+        <Link to="/courses" className="btn-primary inline-block">Go to courses</Link>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-2xl">
       <div>
