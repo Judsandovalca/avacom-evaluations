@@ -1,6 +1,10 @@
 // src/evaluations/EvaluationFormPage.tsx
 import { useNavigate, useParams } from 'react-router-dom';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { AppNav } from '../components/AppNav';
+import { PageShell } from '../components/PageShell';
+import { PageHeader } from '../components/PageHeader';
+import { ErrorAlert } from '../components/ErrorAlert';
 import { EvaluationForm } from './EvaluationForm';
 import { useEvaluation } from './hooks/useEvaluation';
 import { useCreateEvaluation } from './hooks/useCreateEvaluation';
@@ -20,8 +24,22 @@ export function EvaluationFormPage({ mode }: Props) {
   const createMut = useCreateEvaluation();
   const updateMut = useUpdateEvaluation();
 
-  if (mode === 'edit' && eval$.isLoading) return <LoadingSpinner />;
-  if (mode === 'edit' && eval$.isError) return <p className="p-6 text-red-600">Could not load evaluation.</p>;
+  if (mode === 'edit' && eval$.isLoading) {
+    return (
+      <>
+        <AppNav />
+        <PageShell maxWidth="3xl"><LoadingSpinner /></PageShell>
+      </>
+    );
+  }
+  if (mode === 'edit' && eval$.isError) {
+    return (
+      <>
+        <AppNav />
+        <PageShell maxWidth="3xl"><ErrorAlert message="Could not load evaluation." /></PageShell>
+      </>
+    );
+  }
 
   async function onSubmit(data: EvaluationFormInput) {
     try {
@@ -49,15 +67,16 @@ export function EvaluationFormPage({ mode }: Props) {
     : undefined;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-900">
-        {mode === 'create' ? 'New evaluation' : 'Edit evaluation'}
-      </h1>
-      <EvaluationForm
-        initialValues={initial}
-        submitting={createMut.isPending || updateMut.isPending}
-        onSubmit={onSubmit}
-      />
-    </div>
+    <>
+      <AppNav />
+      <PageShell maxWidth="3xl">
+        <PageHeader title={mode === 'create' ? 'New evaluation' : 'Edit evaluation'} />
+        <EvaluationForm
+          initialValues={initial}
+          submitting={createMut.isPending || updateMut.isPending}
+          onSubmit={onSubmit}
+        />
+      </PageShell>
+    </>
   );
 }

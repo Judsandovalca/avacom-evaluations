@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { AuthProvider } from '../auth/AuthProvider';
 
 export function makeQueryClient() {
   return new QueryClient({
@@ -19,7 +20,9 @@ export function AllProviders({ children, initialEntries = ['/'], queryClient }: 
   const qc = queryClient ?? makeQueryClient();
   return (
     <QueryClientProvider client={qc}>
-      <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+      <MemoryRouter initialEntries={initialEntries}>
+        <AuthProvider>{children}</AuthProvider>
+      </MemoryRouter>
     </QueryClientProvider>
   );
 }
