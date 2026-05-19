@@ -51,10 +51,11 @@ jobs:
         run: npm run lint
         continue-on-error: true
 
-      - name: Test (unit + integration) with coverage report (gate advisory)
+      - name: Test (unit + integration) with coverage report (advisory)
         working-directory: backend
-        # Thresholds overridden to 0 so pre-existing coverage debt doesn't
-        # block CI. The vitest config's 90% gate still applies locally.
+        # Tests are advisory in CI by user request: failing tests must
+        # NOT block deploy. Coverage thresholds also disabled.
+        continue-on-error: true
         run: |
           npx vitest run --coverage \
             --coverage.thresholds.lines=0 \
@@ -88,10 +89,11 @@ jobs:
         run: npm run lint
         continue-on-error: true
 
-      - name: Test with coverage report (gate advisory)
+      - name: Test with coverage report (advisory)
         working-directory: frontend
-        # Thresholds overridden to 0 so pre-existing coverage debt doesn't
-        # block CI. The vitest config's 90% gate still applies locally.
+        # Tests are advisory in CI by user request: failing tests must
+        # NOT block deploy. Coverage thresholds also disabled.
+        continue-on-error: true
         run: |
           npx vitest run --coverage \
             --coverage.thresholds.lines=0 \
