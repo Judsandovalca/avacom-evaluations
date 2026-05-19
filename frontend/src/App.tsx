@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './auth/AuthProvider';
@@ -8,6 +8,7 @@ import { SignupPage } from './auth/SignupPage';
 import { EvaluationsListPage } from './evaluations/EvaluationsListPage';
 import { EvaluationFormPage } from './evaluations/EvaluationFormPage';
 import { CoursesPage } from './courses/CoursesPage';
+import { PublicCoursesPage } from './courses/PublicCoursesPage';
 import { NotFoundPage } from './NotFoundPage';
 import { ToastProvider } from './components/ToastProvider';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -24,10 +25,10 @@ export default function App() {
           <BrowserRouter>
             <AuthProvider>
               <Routes>
+                <Route path="/" element={<PublicCoursesPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<Navigate to="/evaluations" replace />} />
                   <Route path="/evaluations" element={<EvaluationsListPage />} />
                   <Route path="/evaluations/new" element={<EvaluationFormPage mode="create" />} />
                   <Route path="/evaluations/:id/edit" element={<EvaluationFormPage mode="edit" />} />
