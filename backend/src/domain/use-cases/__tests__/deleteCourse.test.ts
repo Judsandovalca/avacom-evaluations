@@ -9,7 +9,16 @@ function makeRepo(initial: Course[] = []): CourseRepository {
   return {
     save: vi.fn(async (c: Course) => { store.set(c.courseId, c); }),
     findById: vi.fn(async (id) => store.get(id) ?? null),
-    list: vi.fn(async () => [...store.values()].filter((c) => !c.deletedAt)),
+    findByName: vi.fn(async (name: string) => {
+      const target = name.toLowerCase();
+      return [...store.values()].find(
+        (c) => !c.deletedAt && c.name.toLowerCase() === target,
+      ) ?? null;
+    }),
+    list: vi.fn(async () => ({
+      items: [...store.values()].filter((c) => !c.deletedAt),
+      nextKey: null,
+    })),
     update: vi.fn(async (c: Course) => { store.set(c.courseId, c); }),
   };
 }
