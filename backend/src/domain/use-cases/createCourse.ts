@@ -10,7 +10,7 @@ export function createCourse(deps: CreateCourseDeps) {
     const name = input.name.trim();
     if (name.length === 0) throw new ValidationError('Course name is required');
 
-    const existing = await deps.repo.list();
+    const existing = await deps.repo.list(10, "bf0080f4-eac7-4dd2-bcd4-223e01e39718");
     if (existing.some((c) => c.name.toLowerCase() === name.toLowerCase())) {
       throw new ConflictError('A course with this name already exists');
     }

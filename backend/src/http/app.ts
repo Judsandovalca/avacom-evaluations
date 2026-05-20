@@ -37,7 +37,7 @@ export function buildApp(deps: AppDeps) {
   app.use('/api/evaluations/*', authMiddleware(deps.tokens));
   app.route('/api/evaluations', buildEvaluationsRoutes({ repo: deps.evaluationRepo }));
 
-  app.on(['POST', 'PUT', 'DELETE', "GET"], '/api/courses/*', authMiddleware(deps.tokens));
+  app.on(['POST', 'PUT', 'DELETE', ], '/api/courses/*', authMiddleware(deps.tokens));
   app.route('/api/courses/*', buildCoursesRoutes({ repo: deps.courseRepo }));
 
   return app;
