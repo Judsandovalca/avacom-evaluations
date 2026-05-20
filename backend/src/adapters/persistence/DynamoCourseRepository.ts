@@ -4,6 +4,8 @@ import {
 import type { CourseRepository } from '../../domain/course/CourseRepository';
 import type { Course } from '../../domain/course/Course';
 import { makeDocClient } from './dynamoClient';
+import { Logger } from '@aws-lambda-powertools/logger';
+const logger = new Logger({ serviceName: 'avacom-api' });
 
 export class DynamoCourseRepository implements CourseRepository {
   constructor(
@@ -26,11 +28,16 @@ export class DynamoCourseRepository implements CourseRepository {
     return (r.Item as Course | undefined) ?? null;
   }
 
-  async list(): Promise<Course[]> {
+  async list(limit:number, key: string): Promise<Course[]> {
+    logger.info('list_courses', { limit, key });
     const r = await this.doc.send(new ScanCommand({
       TableName: this.tableName,
       FilterExpression: 'attribute_not_exists(deletedAt) OR deletedAt = :null',
       ExpressionAttributeValues: { ':null': null },
+      Limit: 2,
+      ExclusiveStartKey: {
+        courseId: key,
+      }
     }));
     return (r.Items as Course[] | undefined) ?? [];
   }

@@ -5,7 +5,7 @@ import { listCourses } from '../../domain/use-cases/listCourses';
 import { createCourse } from '../../domain/use-cases/createCourse';
 import { updateCourse } from '../../domain/use-cases/updateCourse';
 import { deleteCourse } from '../../domain/use-cases/deleteCourse';
-import { createCourseSchema, updateCourseSchema } from '../schemas';
+import { createCourseSchema, getListSchema, updateCourseSchema } from '../schemas';
 import { throwOnInvalid } from '../validatorHook';
 
 export interface CoursesDeps { repo: CourseRepository; }
@@ -14,8 +14,16 @@ export function buildCoursesRoutes(deps: CoursesDeps) {
   const r = new Hono();
 
   r.get('/', async (c) => {
-    const items = await listCourses(deps)();
-    return c.json({ items });
+    const key = c.req.query('key') ?? ''
+    const limit = c.req.query('limit') ?? '2'
+    const items = await listCourses(deps)(parseInt(limit), key);
+    const newItem ={
+      name: key,
+      createdAt: '',
+      deletedAt: null,
+      courseId: 'id'
+    }
+    return c.json({ items: [...items, newItem] });
   });
 
   r.post('/', zValidator('json', createCourseSchema, throwOnInvalid), async (c) => {

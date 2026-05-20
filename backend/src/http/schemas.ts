@@ -45,6 +45,10 @@ export type ListEvaluationsQuery = z.infer<typeof listEvaluationsQuerySchema>;
 export const createCourseSchema = z.object({
   name: z.string().min(1).max(100).trim(),
 });
+export const getListSchema = z.object({
+  limit: z.number().int().min(1).max(100).default(10),
+  key: z.string(),
+});
 export type CreateCourseBody = z.infer<typeof createCourseSchema>;
 
 export const updateCourseSchema = z.object({

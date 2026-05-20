@@ -5,8 +5,8 @@ import { DEFAULT_COURSES, Course as CourseFactory } from '../course/Course';
 export interface ListCoursesDeps { repo: CourseRepository; }
 
 export function listCourses(deps: ListCoursesDeps) {
-  return async (): Promise<Course[]> => {
-    const courses = await deps.repo.list();
+  return async (limit: number, key: string): Promise<Course[]> => {
+    const courses = await deps.repo.list(limit, key);
     if (courses.length > 0) {
       return [...courses].sort((a, b) => a.name.localeCompare(b.name));
     }

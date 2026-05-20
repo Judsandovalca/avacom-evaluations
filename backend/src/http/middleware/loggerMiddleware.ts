@@ -13,6 +13,8 @@ export function loggerMiddleware(): MiddlewareHandler {
     logger.info('request_received', {
       method: c.req.method,
       path: c.req.path,
+      key: c.req.param('key'),
+      limit: c.req.param('limit'),
     });
 
     try {
