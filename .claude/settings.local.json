@@ -1,8 +1,23 @@
 {
   "permissions": {
+    "defaultMode": "bypassPermissions",
     "allow": [
       "Skill(superpowers:brainstorming)",
-      "Skill(superpowers:writing-plans)"
+      "Skill(superpowers:writing-plans)",
+      "Bash(lsof -iTCP:3000 -sTCP:LISTEN -nP)",
+      "Bash(lsof -iTCP:5173 -sTCP:LISTEN -nP)",
+      "Bash(lsof -iTCP:8000 -sTCP:LISTEN -nP)",
+      "Bash(docker exec *)",
+      "Bash(AWS_ACCESS_KEY_ID=local AWS_SECRET_ACCESS_KEY=local AWS_REGION=us-east-1 docker run --rm --network avacom-net amazon/aws-cli --endpoint-url http://avacom-ddb-local:8000 dynamodb list-tables)",
+      "Bash(docker network *)",
+      "Bash(docker inspect *)",
+      "Bash(npm --prefix /Users/giovanacaceres/Documents/avacom-evaluations/backend run ddb:init)",
+      "Bash(docker run *)",
+      "Bash(curl -s -o /dev/null http://localhost:3000/api/courses)",
+      "Bash(wait)",
+      "Bash(curl -s -i -X POST http://localhost:3000/api/courses/abc -H 'Content-Type: application/json' -d '{\"name\":\"x\"}')",
+      "Bash(curl -s -i -X PUT http://localhost:3000/api/courses/ -H 'Content-Type: application/json' -d '{\"name\":\"x\"}')",
+      "Bash(git pull *)"
     ]
   }
 }

@@ -13,11 +13,10 @@ export function updateCourse(deps: UpdateCourseDeps) {
     const existing = await deps.repo.findById(input.courseId);
     if (!existing || existing.deletedAt) throw new NotFoundError('Course not found');
 
-    const others = await deps.repo.list(10, "bf0080f4-eac7-4dd2-bcd4-223e01e39718");
-    const clash = others.find(
-      (c) => c.courseId !== input.courseId && c.name.toLowerCase() === name.toLowerCase(),
-    );
-    if (clash) throw new ConflictError('A course with this name already exists');
+    const clash = await deps.repo.findByName(name);
+    if (clash && clash.courseId !== input.courseId) {
+      throw new ConflictError('A course with this name already exists');
+    }
 
     const updated: Course = { ...existing, name };
     await deps.repo.update(updated);
